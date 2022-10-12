@@ -1,0 +1,82 @@
+#FRANKE RUN BASED ON INPUTS:
+
+from func import*
+from plot import*
+
+
+""" Data """
+x, y, z = data_FF()
+data = 'FF'
+print("Number of datapoints of z:", np.shape(z))
+
+"""Regression on the Real Terrain Data:"""
+order = 15  # 20 for LASSO
+degrees = np.arange(order)
+
+lambda_min, lambda_max = -12, 5
+nlambdas = 18
+lambdas = np.logspace(lambda_min, lambda_max, nlambdas)
+
+seed = 1
+n_boostraps = 50
+k = 10
+save = True
+scale = True
+LASSOiter = 1000
+LASSOtol = 0.05
+
+#########################################################################
+
+#RESULTS FROM TERRAIN RUN:
+
+(base) STIGs-MacBook-Pro:machine stigpatey$ python franke_main.py
+Number of datapoints of z: (400, 1)
+
+OLS
+# MSE and R2 (No resampeling) - Starting
+OLS - Lowest MSE = 0.0394 and was achieved using no resampling is found at polynomial degree = 10.
+OLS - Highest R2 score  = 0.9650 and was achieved using no resampling is found at polynomial degree = 10.
+# MSE and R2 (No resampeling) - Ended
+
+# MSE (CV) - Starting
+OLS - Lowest MSE = 0.0373 and was achieved using CV is found at polynomial degree = 8.
+# MSE (CV) - Ended
+
+# BVTO (BS) - Starting
+OLS - Lowest MSE 0.0588 using BS is found at polynomial degree = 6.
+# BVTO (BS) - Ended
+
+# Beta (No resampeling) - Strating
+# Beta (No resampeling) - Ended
+
+
+RIDGE
+# BVTO (BS) - Strated
+RIDGE - Lowest MSE 0.0573 using BS is found at polynomial degree = 6, and lambda = 0.1.
+# BVTO (BS) - Ended
+
+# Heatmap around the best polynomial dregree and best lambda (BS) - Started
+RIDGE - Lowest MSE 0.0573 using BS is found at polynomial degree = 6, and lambda = 0.1.
+# Heatmap around the best polynomial dregree and best lambda (BS) - Ended
+
+# Heatmap around the best polynomial dregree and best lambda (CV) - Started
+RIDGE - Lowest MSE 0.0370 using CV is found at polynomial degree = 10, and lambda = 0.1.
+# Heatmap around the best polynomial dregree and best lambda (CV) - Ended
+
+
+
+LASSO
+# Heatmap around the best polynomial dregree and best lambda (CV) - Started
+LASSO - Lowest MSE 0.0478 using CV is found at polynomial degree = 13, and lambda = 1e-05.
+# Heatmap around the best polynomial dregree and best lambda (CV) - Ended
+
+(base) STIGs-MacBook-Pro:machine stigpatey$ python franke_main.py
+Number of datapoints of z: (400, 1)
+
+# BVTO (BS) - Strated
+LASSO - Lowest MSE 0.1325 using BS is found at polynomial degree = 13, and lambda = 1e-12.
+# BVTO (BS) - Ended
+
+# Heatmap around the best polynomial dregree and best lambda (BS) - Started
+LASSO - Lowest MSE 0.1325 using BS is found at polynomial degree = 13, and lambda = 1e-11.
+# Heatmap around the best polynomial dregree and best lambda (BS) - Ended
