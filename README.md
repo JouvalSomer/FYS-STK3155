@@ -19,9 +19,8 @@ For internal testing purposes we created:
 
 
 -Output files from terminal:
-
-- terminal_print_FF (Franke Function)
-- Terrain_results
+- franke__results
+- terrain_results
 
 Note that output from multiple runs are not provided.
 
