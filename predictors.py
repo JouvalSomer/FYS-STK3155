@@ -28,9 +28,9 @@ def num_pred_plot(deg,n):
 
     return orderarray, predarray, ratio_pred_to_data_points
 
-deg = 30 #polynomial degree
+deg = 20 #polynomial degree
 
-n= 2701 #terrain data points
+n= 400 #terrain data points
 
 Plot = num_pred_plot(deg,n)
 plt.plot(Plot[0], Plot[1])
