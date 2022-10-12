@@ -3,7 +3,7 @@
 This project is for regression methods in Project 01 in FYS-STK4155 at UiO.
 October 2022.
 
-Authors: Joval Somer and Stig Patey
+Authors: Jouval Somer and Stig Patey
 
 
 ### Regression analysis and resampling methods
