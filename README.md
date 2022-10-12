@@ -44,5 +44,5 @@ Just to calculate the number of variables in the design matrix given a n-th orde
 ### scaledemo.py
 Testing of scaling, own code for validation.
 
-##Note:
-We observed some anomalities when running multiple LASSO plots at once. Mainly the LASSO plot copied some values from the previous runs. This did not occur for Ridge. The problem was solved by commenting out plots and run only one LASSO plot at the time.
+## Note:
+> We observed some anomalities when running multiple LASSO plots at once. Mainly the LASSO plot copied some values from the previous runs. This did not occur for Ridge. The problem was solved by commenting out plots and run only one LASSO plot at the time.
