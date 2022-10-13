@@ -18,7 +18,7 @@ For internal testing purposes we created:
 - scaledemo.py
 
 
--Output files from terminal:
+### Output files from terminal:
 - franke__results
 - terrain_results
 
