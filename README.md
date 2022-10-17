@@ -1,4 +1,4 @@
-# FYS-STK3155
+# FYS-STK3155 – Applied Data Analysis and Machine Learning
 
 ## Project 1 - Regression analysis and resampling methods
 Project 1 description:
