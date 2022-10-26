@@ -293,23 +293,38 @@ if __name__=='__main__':
     print(f'MSE_OLS = {MSE(y_test, y_predict_OLS_test):.5f}')
 
 
+
+    """ PLOTS """
+    plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    "font.serif": ["ComputerModern"]})
+    plt.rcParams['figure.figsize'] = (8,6)
+    plt.rcParams.update({'font.size': 20})
+    plt.rc('axes', facecolor='whitesmoke', edgecolor='none',
+       axisbelow=True, grid=True)
+    plt.rc('grid', color='w', linestyle='solid')
+    plt.rc('lines', linewidth=2)
+
     """ Regression line plot """
-    plt.scatter(x_train, y_predict_GD, c='r', label='GD') 
-    plt.scatter(x_train, y_predict_SGD, c='b', label='SGD') 
-    plt.scatter(x_train, y_predict_OLS, c='k', zorder=100, label='OLS') 
-    plt.plot(x_train, y_train, 'g.', label='Data') # Data
-    plt.xlabel(r'$x$')
-    plt.ylabel(r'$y$')
-    plt.legend()
+    plt.scatter(x_train, y_predict_GD, c='crimson', s=5,label='GD') 
+    plt.scatter(x_train, y_predict_SGD, c='limegreen', s=5, label='SGD') 
+    plt.scatter(x_train, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
+    plt.plot(x, y_func(x, exact_theta), zorder=100, c='black', label='True y') 
+    plt.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
+    plt.title(r'Regression line plot', pad=15)
+    plt.xlabel(r'$x$', labelpad=10)
+    plt.ylabel(r'$y$',  labelpad=10)
+    plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
     plt.show()
     
-
     """ MSE plot """
     plt.yscale('log')
     iter_max = min(Niterations, n_epochs*n_minibatches)
     plt.plot(np.arange(Niterations)[:iter_max], mse_GD[:iter_max], label='MSE for GD')
     plt.plot(range(n_epochs*n_minibatches)[:iter_max], mse_SGD[:iter_max], label='MSE for SGD')
-    plt.xlabel(r'$Iterations$')
-    plt.ylabel(r'$MSE$')
-    plt.legend()
+    plt.title(r'MSE plot', pad=15)
+    plt.xlabel(r'Iterations',  labelpad=10)
+    plt.ylabel(r'MSE',  labelpad=10)
+    plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
     plt.show()
