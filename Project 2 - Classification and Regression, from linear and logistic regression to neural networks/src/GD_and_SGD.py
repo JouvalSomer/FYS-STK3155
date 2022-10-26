@@ -91,11 +91,11 @@ def OLS(X, y):
     y_predict_OLS = X @ theta_linreg 
     return y_predict_OLS
         
-def GD(X, x, y, method, Niterations, init_LR, decay, momentum, plot, seed):
+def GD(X, y, method, Niterations, init_LR, decay, momentum, seed):
 
     """ Gradient Decent """
     np.random.seed(seed)
-    theta = np.random.randn(3,1) # Initial thetas/betas
+    theta = np.random.randn(np.shape(X)[1],1) # Initial thetas/betas
     change = 0.0
     # Gradient decent:
     for i in range(Niterations):
@@ -106,11 +106,8 @@ def GD(X, x, y, method, Niterations, init_LR, decay, momentum, plot, seed):
             gradients = gradient_CostOLS(theta, X, y) # Analytical 
 
         eta = learning_schedule(i, init_LR, decay) # LR
-
         update = eta * gradients + momentum * change # Update to the thetas
-
         theta -= update # Updating the thetas
-
         change = update # Update the amount the momentum gets added 
 
     print('GD thetas:')
@@ -119,11 +116,11 @@ def GD(X, x, y, method, Niterations, init_LR, decay, momentum, plot, seed):
     y_predict_GD = X @ theta
     return y_predict_GD
 
-def SGD(X, x, y, Optimizer_method, Gradient_method, minibatch_size, n_epochs, init_LR, decay, momentum, plot, seed):
+def SGD(X, y, Optimizer_method, Gradient_method, minibatch_size, n_epochs, init_LR, decay, momentum, seed):
 
     """ Stochastic Gradient Decent """
     np.random.seed(seed)
-    theta = np.random.randn(3,1) # Initial thetas/betas
+    theta = np.random.randn(np.shape(X)[1],1) # Initial thetas/betas
     change = 0.0
 
     n_minibatches = int(n/minibatch_size) #number of minibatches
@@ -161,7 +158,6 @@ def SGD(X, x, y, Optimizer_method, Gradient_method, minibatch_size, n_epochs, in
                 theta -= update
                 change = update
 
-
     print('SGD thetas:')
     print(theta, '\n')
 
@@ -174,7 +170,9 @@ if __name__=='__main__':
     n = 100
     x = np.linspace(0, 1, n)
     y = 3 + 2*x + 3*x**2
-    alpha = 0.1 # Noise scaling
+    exact_theta = [3.0, 2.0, 3.0]
+    print('Exact theta:\n', np.array(exact_theta).reshape(-1, 1), '\n')
+    alpha = 0.5 # Noise scaling
     seed = 3155
     np.random.seed(seed)
     y = (y + alpha*np.random.normal(0, 1, x.shape)).reshape(-1, 1)
@@ -195,14 +193,14 @@ if __name__=='__main__':
     # If you want plain GD without any optimization choose 'momentum' with momentum value of 0
     Optimizer_method = ['Adagrad', 'RMSprop', 'momentum']
 
-    plot = True
     Niterations = 400 # Number of GD iterations
-    y_predict_GD = GD(X, x, y, Gradient_method[0], Niterations, init_LR, decay, momentum, plot, seed)
-    y_predict_SGD = SGD(X, x, y, Optimizer_method[2], Gradient_method[0], minibatch_size, n_epochs, init_LR, decay, momentum, plot, seed)
-
+    y_predict_GD = GD(X, y, Gradient_method[0], Niterations, init_LR, decay, momentum, seed)
+    y_predict_SGD = SGD(X, y, Optimizer_method[2], Gradient_method[0], minibatch_size, n_epochs, init_LR, decay, momentum, seed)
+    y_predict_OLS = OLS(X, y)
 
     plt.plot(x, y_predict_GD, "r-", label='GD') 
     plt.plot(x, y_predict_SGD, "b-", label='SGD') 
+    plt.plot(x, y_predict_OLS, "k-", zorder=100, label='OLS') 
     plt.plot(x, y ,'g.', label='Data') # Data
     plt.xlabel(r'$x$')
     plt.ylabel(r'$y$')
