@@ -221,6 +221,11 @@ def SGD(X, y, Optimizer_method, Gradient_method, minibatch_size, n_minibatches, 
                 update = RMSprop(gradients, eta, Giter)
                 theta -= update
 
+            if Optimizer_method == 'Adam':
+                eta = init_LR
+                update = Adam(gradients, eta, Giter)
+                theta -= update
+
             if Optimizer_method == 'momentum':
                 eta = learning_schedule(epoch, init_LR, decay) # LR
                 update = eta * gradients + momentum * change # Update to the thetas            
@@ -274,7 +279,7 @@ if __name__=='__main__':
 
     """ Optimization method """
     # If you want plain GD without any optimization choose 'momentum' with momentum value of 0
-    Optimizer_method = ['Adagrad', 'RMSprop', 'momentum']
+    Optimizer_method = ['Adagrad', 'RMSprop', 'Adam','momentum']
 
 
 
