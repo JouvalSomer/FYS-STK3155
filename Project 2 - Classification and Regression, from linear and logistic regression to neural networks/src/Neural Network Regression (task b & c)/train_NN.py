@@ -83,9 +83,14 @@ def train_NN_GD(ANN, x_train, y_train, x_test, y_test, epochs, learning_rate, de
         grad = cost_grad(y_train, output, lmb, weights)
 
         for idx,layer in enumerate(reversed(ANN)):
-            grad = layer.backward(grad, learning_rate, decay, O_M, momentum, epoch, change_w, change_b, Layer_optim[count][0], Layer_optim[count][1], lmb)
-            if (idx+1) % 2 == 0:
-                count += 1
+            if O_M == 'momentum':
+                grad = layer.backward(grad, learning_rate, decay, O_M, momentum, epoch, change_w, change_b, optim_w, optim_b, lmb)
+                if (idx+1) % 2 == 0:
+                    count += 1
+            else:
+                grad = layer.backward(grad, learning_rate, decay, O_M, momentum, epoch, change_w, change_b, Layer_optim[count][0], Layer_optim[count][1], lmb)
+                if (idx+1) % 2 == 0:
+                    count += 1
     return cost_train, cost_test, R2_train, R2_test
 
 
@@ -158,9 +163,14 @@ def train_NN_SGD(ANN, input_train, z_train, input_test, z_test, epochs, learning
             change_w = change_b = 0.0
             count = 0
             for idx,layer in enumerate(reversed(ANN)):
-                grad = layer.backward(grad, learning_rate, decay, O_M, momentum, epoch, change_w, change_b, Layer_optim[count][0], Layer_optim[count][1], lmb)
-                if (idx+1) % 2 == 0:
-                    count += 1
+                if O_M == 'momentum':
+                    grad = layer.backward(grad, learning_rate, decay, O_M, momentum, epoch, change_w, change_b, optim_w, optim_b, lmb)
+                    if (idx+1) % 2 == 0:
+                        count += 1
+                else:
+                    grad = layer.backward(grad, learning_rate, decay, O_M, momentum, epoch, change_w, change_b, Layer_optim[count][0], Layer_optim[count][1], lmb)
+                    if (idx+1) % 2 == 0:
+                        count += 1
 
     return cost_train, cost_test, R2_train, R2_test
 
