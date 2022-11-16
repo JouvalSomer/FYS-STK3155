@@ -24,8 +24,8 @@ def GD(X_train, X_test, y_train, y_test, Gradient_method, Optimizer_method, Nite
         optim = Adam(init_LR)
 
     # Gradient decent:
+    Giter = np.zeros(shape=(X_train.shape[1],X_train.shape[1]))
     for i in range(Niterations):
-        Giter = np.zeros(shape=(X_train.shape[1],X_train.shape[1]))
 
         """ Gradient method """
         if Gradient_method == 'auto':  
