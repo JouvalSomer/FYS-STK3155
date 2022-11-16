@@ -1,6 +1,6 @@
 """General functions used"""
 
-import numpy as np 
+import numpy as np
 import autograd.numpy as np
 from autograd import grad
 from sklearn.metrics import mean_squared_error, r2_score
@@ -90,7 +90,7 @@ def cost_theta(theta, X, y, lmb):
 
 def cost_theta_diff(theta, X, y, lmb):
     n = X.shape[0]
-    return lmb*theta - X.T @(y - X@theta)/n
+    return lmb*theta - 2*X.T @(y - X@theta)/n
 
 
 def auto_gradient(theta, X, y, lmb):
