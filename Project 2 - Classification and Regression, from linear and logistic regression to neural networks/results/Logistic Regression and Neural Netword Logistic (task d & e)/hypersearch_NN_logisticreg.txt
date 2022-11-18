@@ -1,0 +1,57 @@
+Logistic Regression using FFNN.
+
+This contains terminal output from hyperparameter search. The search starts with B=100
+Bootstraps, then B=1000 on narrower space.
+
+
+The winner with B=1000 is:
+
+The final model has a mean accuracy of 0.975 with 1000 Bootstraps with:
+
+40 epochs, 15 minibatch size, lambda 0. test size: 0.20
+
+
+Details from the winner:
+
+
+FINAL RUN:
+
+B=1000
+
+The Champion is:
+[0, 0, 40, 15, 0, "<class 'activation.Sigmoid'>", 0.9745350877192981, 0.014175804993527786, 0.07013862496392327, 0.052201104623100306, 0.2]
+The Secondrunner is:
+
+
+
+
+First Run:
+
+B=100
+
+The Champion is:
+[0, 20, 500, 30, 0.000875, "<class 'activation.Sigmoid'>", 0.9732456140350877, 0.015710083060151148, 0.06171676174480422, 0.03725821449593828, 0.2]
+The Secondrunner is:
+[0, 20, 100, 30, 0, "<class 'activation.Sigmoid'>", 0.9728070175438596, 0.014387034620049753, 0.06925714635032713, 0.05282065107284571, 0.2]
+The Thirdrunner is:
+[0, 20, 100, 30, 0.000875, "<class 'activation.Sigmoid'>", 0.9707894736842104, 0.015094602672986793, 0.06999736434247143, 0.03877321255387478, 0.2]
+The Fourthrunner is:
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+The Fifthrunner is:
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+FINAL RUN:
+
+B=1000
+
+The Champion is:
+[0, 0, 40, 15, 0, "<class 'activation.Sigmoid'>", 0.9745350877192981, 0.014175804993527786, 0.07013862496392327, 0.052201104623100306, 0.2]
+The Secondrunner is:
+[0, 0, 30, 15, 0, "<class 'activation.Sigmoid'>", 0.9739912280701754, 0.014540714005998719, 0.08080683791222154, 0.051940069214371214, 0.2]
+The Thirdrunner is:
+[0, 0, 20, 15, 0, "<class 'activation.Sigmoid'>", 0.9713684210526315, 0.015360408068858682, 0.09773160015396552, 0.05289636702052728, 0.2]
+The Fourthrunner is:
+[0, 0, 15, 15, 0, "<class 'activation.Sigmoid'>", 0.968780701754386, 0.016051718409459577, 0.11263917305035141, 0.053347857003117755, 0.2]
+The Fifthrunner is:
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]

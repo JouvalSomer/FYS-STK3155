@@ -12,28 +12,13 @@ from sklearn.preprocessing import StandardScaler
 #PCA:
 from sklearn.decomposition import PCA
 
-
 """Load the data"""
 cancer = load_breast_cancer()
 X = cancer.data
 Y = cancer.target.reshape(-1,1)
 
-
-# """Split"""
-# X_train, X_test, y_train, y_test = train_test_split(X,Y,random_state=0)
-#
-#
-# """The Standardscaler (TBD performs slightly worse with scaling...)"""
-# scaler = StandardScaler()
-# scaler.fit(X_train)
-#
-# X_train = scaler.transform(X_train)
-# X_train[:,0]=1 #adds back 1 in first column for intercept.
-# X_test = scaler.transform(X_test)
-# X_test[:,0]=1 #adds back 1 in first column for intercept.
-
 """Bootstrapping over B boots to find mean Cost and Accuracy:"""
-B=100
+B=1000
 costboot = np.zeros((B)).reshape(-1,1)
 acc_boot = np.zeros((B)).reshape(-1,1)
 
@@ -49,13 +34,12 @@ for boot in range (B):
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
 
-
-    """Add Intercept (did not make much difference.)"""
+    """Add Intercept (did actually not make much difference.)"""
     X_train    = np.c_[np.ones(X_train.shape[0]), X_train]
     X_test     = np.c_[np.ones(X_test.shape[0]), X_test]
 
 
-    """PCA (did not make much difference)"""
+    """PCA (disabled. Did not improve model)"""
     # pca = PCA(n_components=20)
     # X_train = pca.fit_transform(X_train)
     # X_test = pca.transform(X_test)
@@ -66,16 +50,15 @@ for boot in range (B):
     # print(abs( pca.components_ ))
 
     """ Hyperparameters """
-    n_epochs = 1000          # Number of epochs
-    init_LR = 0.001        # Initial learning rate (LR)
+    n_epochs = 500          # Number of epochs
+    init_LR = 0.0025        # Initial learning rate (LR)
     decay = 0.0             # init_LR/n_epochs # LR decay rate (for fixed LR set decay to 0)
     momentum = 0.8          # Momentum value for GD and SGD.
     minibatch_size = 30
     n_minibatches =  (X_train.shape[0]//minibatch_size) #number of minibatches
     N_iter_GD = n_epochs*n_minibatches
-    lmb =  0#1e-12
+    lmb =  0.000875
     seed = np.random.randint(0, 100000)
-    #seed =55
 
     """ Gradient method """
     Gradient_method = ['log', 'anal']
@@ -88,7 +71,7 @@ for boot in range (B):
 
     y_pred, prob_SGD, theta, cost, acc_score = SGD(X_train, X_test, y_train, y_test, O_M, G_M, minibatch_size, n_minibatches, n_epochs, init_LR, decay, momentum, seed, lmb)
 
-    #print(cost)
+    #print(cost.shape)
 
     """TBD: Lage TEST COST PLOT"""
 

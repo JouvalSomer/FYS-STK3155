@@ -1,0 +1,147 @@
+
+This contains terminal output from hyperparameter search. The search starts with B=100
+Bootstraps, then B=1000 on narrower space.
+
+The final model has a mean accuracy of 0.980 with 1000 Bootstraps with:
+
+NN: 1 Layer, 20 nodes, 25 epochs, 30 minibatxh size, lambda 0.000875.
+
+
+
+Results large search with B=100:
+
+
+The Champion is:
+[1, 20, 20, 30, 0.01, "<class 'activation.Sigmoid'>", 0.979561403508772, 0.011373442144361645]
+The Secondrunner is:
+[1, 20, 20, 30, 0, "<class 'activation.Sigmoid'>", 0.9776315789473682, 0.011858338451399796]
+The Thirdrunner is:
+[1, 10, 70, 60, 1e-05, "<class 'activation.Sigmoid'>", 0.977017543859649, 0.01445533126674702]
+The Fourthrunner is:
+[1, 10, 70, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9759649122807016, 0.015525076766896713]
+The Fifthrunner is:
+[1, 10, 30, 20, 0, "<class 'activation.Sigmoid'>", 0.975877192982456, 0.013945713241740912]
+
+
+Fine tuning (FT) runs with B=100:
+
+FT run 1:
+
+The Champion is:
+[1, 20, 24, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9801754385964913, 0.009816726198973866]
+The Secondrunner is:
+[1, 20, 24, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9796491228070175, 0.011293668027670924]
+The Thirdrunner is:
+[1, 20, 23, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9794736842105262, 0.010901218514319976]
+The Fourthrunner is:
+[1, 20, 22, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9777192982456139, 0.012797400859534649]
+The Fifthrunner is:
+[1, 20, 20, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9764912280701753, 0.013639152088124072]
+
+
+FT run 2:
+
+The Champion is:
+[1, 20, 25, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9801754385964911, 0.009498019427115185]
+The Secondrunner is:
+[1, 20, 24, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9796491228070172, 0.01073477792335322]
+The Thirdrunner is:
+[1, 20, 20, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9771929824561403, 0.012528821804461132]
+The Fourthrunner is:
+[1, 20, 20, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9763157894736841, 0.012559492160768723]
+
+
+
+FT run 3:
+
+The Champion is:
+[1, 20, 25, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9800877192982455, 0.009517038550738278]
+The Secondrunner is:
+[1, 20, 24, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9796491228070174, 0.011361596392064674]
+The Thirdrunner is:
+[1, 20, 23, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9793859649122807, 0.01077020101562163]
+The Fourthrunner is:
+[1, 20, 23, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9784210526315789, 0.012054304130738156]
+The Fifthrunner is:
+[1, 20, 20, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9772807017543859, 0.013308783955665435]
+
+
+FT run 4:
+
+The Champion is:
+[1, 20, 24, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9804385964912279, 0.010875424304420005]
+The Secondrunner is:
+[1, 20, 22, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9797368421052631, 0.010864097946542034]
+The Thirdrunner is:
+[1, 20, 20, 30, 0.0001, "<class 'activation.Sigmoid'>", 0.9774561403508771, 0.012043767010032028]
+The Fourthrunner is:
+[1, 20, 20, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9760526315789473, 0.013061341651497738]
+The Fifthrunner is:
+[1, 20, 20, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9759649122807016, 0.012443779386880929]
+
+FT run 5:
+
+The Champion is:
+[1, 20, 26, 30, 0.001, "<class 'activation.Sigmoid'>", 0.979736842105263, 0.009664660536253158]
+The Secondrunner is:
+[1, 20, 24, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9795614035087717, 0.009772339277698478]
+The Thirdrunner is:
+[1, 20, 24, 30, 0.01, "<class 'activation.Sigmoid'>", 0.9793859649122806, 0.010841409731849353]
+The Fourthrunner is:
+[1, 20, 24, 29, 0.001, "<class 'activation.Sigmoid'>", 0.9778947368421052, 0.011602846150025572]
+The Fifthrunner is:
+[1, 20, 22, 29, 0.001, "<class 'activation.Sigmoid'>", 0.9755263157894736, 0.01530921665196388]
+
+FT run 6:
+
+The Champion is:
+[1, 20, 25, 30, 0.0015, "<class 'activation.Sigmoid'>", 0.9802631578947368, 0.009639149550805207]
+The Secondrunner is:
+[1, 20, 25, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9801754385964911, 0.009498019427115185]
+The Thirdrunner is:
+[1, 20, 25, 30, 0.000875, "<class 'activation.Sigmoid'>", 0.9797368421052629, 0.009504093495285493]
+The Fourthrunner is:
+[1, 20, 24, 30, 0.00075, "<class 'activation.Sigmoid'>", 0.9796491228070175, 0.009837084750088536]
+The Fifthrunner is:
+[1, 20, 23, 30, 0.0015, "<class 'activation.Sigmoid'>", 0.9785087719298246, 0.011727843822035901]
+
+
+FT run 7:
+
+The Champion is:
+[1, 20, 25, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9802631578947367, 0.009797503466530104]
+The Secondrunner is:
+[1, 20, 25, 30, 0.000875, "<class 'activation.Sigmoid'>", 0.9801754385964913, 0.00965868744456195]
+The Thirdrunner is:
+[1, 20, 25, 30, 0.00075, "<class 'activation.Sigmoid'>", 0.9799999999999999, 0.009372428343293375]
+The Fourthrunner is:
+[1, 20, 24, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9798245614035086, 0.009962997097895202]
+The Fifthrunner is:
+[1, 20, 24, 30, 0.00075, "<class 'activation.Sigmoid'>", 0.979561403508772, 0.009772339277698478]
+
+
+NOW FINAL RUNS with B=1000:
+
+The Champion is:
+[1, 20, 25, 30, 0.000875, "<class 'activation.Sigmoid'>", 0.9800789473684208, 0.009559226373732636]
+The Secondrunner is:
+[1, 20, 24, 30, 0.0015, "<class 'activation.Sigmoid'>", 0.9796052631578945, 0.009757663055470467]
+The Thirdrunner is:
+[1, 20, 24, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9795877192982455, 0.009752520173697706]
+The Fourthrunner is:
+[1, 20, 24, 30, 0.000875, "<class 'activation.Sigmoid'>", 0.9779824561403508, 0.011497253007388866]
+The Fifthrunner is:
+[0, 0, 0, 0, 0, 0, 0, 0]
+
+
+
+The Champion is:
+[1, 20, 25, 30, 0.000875, "<class 'activation.Sigmoid'>", 0.9800614035087717, 0.009538726528514166]
+The Secondrunner is:
+[1, 20, 25, 30, 0.00075, "<class 'activation.Sigmoid'>", 0.9799561403508771, 0.009463017874576369]
+The Thirdrunner is:
+[1, 20, 24, 30, 0.001, "<class 'activation.Sigmoid'>", 0.9795614035087717, 0.009756578700910495]
+The Fourthrunner is:
+[1, 20, 24, 30, 0.00075, "<class 'activation.Sigmoid'>", 0.9794473684210525, 0.009796918347648674]
+The Fifthrunner is:
+[1, 20, 24, 29, 0.00125, "<class 'activation.Sigmoid'>", 0.976877192982456, 0.011334148034375036]
