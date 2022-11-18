@@ -1,0 +1,40 @@
+minibatch_size 10 n_minibatches 200
+3it [00:40, 13.63s/it]
+
+The lowest cost with SGD was achieved 50 nodes, and with lambda = 1e-13.
+
+The lowest cost was 0.017428644991176887.
+
+The highest R2 score was 0.8237407049950833.
+
+3it [00:37, 12.38s/it]
+
+The lowest cost with SGD was achieved 100 nodes, and with lambda = 1e-09.
+
+The lowest cost was 0.01705417035225383.
+
+The highest R2 score was 0.827527872435295.
+
+3it [00:43, 14.43s/it]
+
+The lowest cost with SGD was achieved 10 nodes, and with lambda = 1e-13.
+
+The lowest cost was 0.03561246429308373.
+
+The highest R2 score was 0.6398441845041979.
+
+3it [00:45, 15.12s/it]
+
+The lowest cost with SGD was achieved 10 nodes, and with lambda = 1e-13.
+
+The lowest cost was 0.03326137963593404.
+
+The highest R2 score was 0.6636211634014395.
+
+3it [00:49, 16.33s/it]
+
+The lowest cost with SGD was achieved 10 nodes, and with lambda = 1e-07.
+
+The lowest cost was 0.036074567069760935.
+
+The highest R2 score was 0.6351723529801161.

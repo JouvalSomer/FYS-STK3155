@@ -1,0 +1,13 @@
+n_epochs =  20
+init_LR =  0.01
+minibatch_size =  10
+n_minibatches =  200
+
+
+4it [44:08, 662.08s/it]
+
+The lowest cost with SGD was achieved 10 nodes, and with lambda = 1e-11.
+
+The lowest cost was 0.013579539501311482.
+
+The highest R2 score was 0.862667461521509.

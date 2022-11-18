@@ -12,6 +12,7 @@ from func import*
 
 
 def cost_heatmap(X, Y, Z, n_epochs, init_LR, decay, O_M, momentum, minibatch_size, n_minibatches, lambda_min, lambda_max, nlambdas, n_seeds, acti_func):
+
     plt.rcParams.update({
     "text.usetex": True,
     "font.family": "serif",
@@ -23,7 +24,7 @@ def cost_heatmap(X, Y, Z, n_epochs, init_LR, decay, O_M, momentum, minibatch_siz
     plt.rcParams.update({'font.size': 26})
 
     lambdas = np.logspace(lambda_min, lambda_max, nlambdas)
-    n_nodes = [5, 10, 50, 100]
+    n_nodes = [10, 50, 100, 150]
 
     MSE_nodes_lambda_SGD = np.empty((len(n_nodes), nlambdas))
     method = 'Regg'
@@ -46,17 +47,18 @@ def cost_heatmap(X, Y, Z, n_epochs, init_LR, decay, O_M, momentum, minibatch_siz
                 acti_func(),
                 Layer(nodes, nodes),
                 acti_func(),
+                Layer(nodes, nodes),
+                acti_func(),
                 Layer(nodes, n_nodes_outputLayer),
                 Linear_Activation()
-                ]
+            ]
 
                 mse_SGD_train, mse_SGD_test, R2_SGD_train, R2_SGD_test = train_NN_SGD(ANN_SGD, input_train, z_train, input_test, z_test, n_epochs, init_LR, decay, O_M, momentum, minibatch_size, n_minibatches, seed, lmb, method)
 
-                y_pred_SGD = fwd(ANN_SGD, input_test)[0]
 
                 mse_SGD += mse_SGD_test[-1]
 
-                MSE_nodes_lambda_SGD[n_idx,l_idx] = mse_SGD #/len(seeds)
+            MSE_nodes_lambda_SGD[n_idx,l_idx] = mse_SGD/n_seeds
 
     """ Heatmap Plot for SGD """
     sns.heatmap(MSE_nodes_lambda_SGD.T, cmap="RdYlGn_r",
@@ -69,14 +71,14 @@ def cost_heatmap(X, Y, Z, n_epochs, init_LR, decay, O_M, momentum, minibatch_siz
     ax.set_yticks(y_idx, [str(f'{lam:1.1E}') for lam in lambdas], rotation=0, fontsize='medium')
     ax.set_xlabel(r"Nodes in the layer", labelpad=10,  fontsize='medium')
     ax.set_ylabel(r'$\log_{10} \lambda$', labelpad=10,  fontsize='medium')
-    ax.set_title(r'\bf{Cost Heatmap for NN on Franke Data - SGD w/ Adam}', pad=15)
+    ax.set_title(fr'Cost Heatmap for NN on Franke Data - SGD, Adam and {acti_func.__name__}', pad=15)
     ax.xaxis.tick_top()
     ax.xaxis.set_label_position('top')
     plt.tight_layout()
-    plt.savefig(f'cost_heatmap_NN_Franke_B{n_seeds}_LR{init_LR}_{acti_func}.png', dpi=150)
+    plt.savefig(f'cost_heatmap_{acti_func.__name__}_1.png', dpi=150)
     plt.clf()
 
-    """ Finding the aramaters that gave the lowest cost """
+    """ Finding the paramaters that give the lowest cost """
     index = np.argwhere(MSE_nodes_lambda_SGD == np.min(MSE_nodes_lambda_SGD))
     best_n_nodes_cost = n_nodes[index[0,0]]
     best_lambda_cost = lambdas[index[0,1]]
@@ -103,12 +105,12 @@ def cost_plot_SGD(n_epochs, n_minibatches, cost_SGD_train, cost_SGD_test, acti_f
     plt.yscale('log')
     plt.plot(iters, cost_SGD_test, zorder=100, label=r'Test Cost')
     plt.plot(iters, cost_SGD_train, zorder=5, label=r'Train Cost')
-    plt.title(r'\bf{Cost as Function of Iteration - SGD w/ Adam}', pad=15)
+    plt.title(fr'Cost as Function of Iteration - SGD, Adam and {acti_func.__name__}', pad=15)
     plt.xlabel(fr'Iterations (number of epochs = {n_epochs}, number of batches {n_minibatches})', labelpad=10)
     plt.ylabel(r'Cost (log-scale)', labelpad=10)
     plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
     plt.tight_layout()
-    plt.savefig(f'cost_plot_NN_Franke_B{n_seeds}_LR{init_LR}_{acti_func}.png', dpi=150)
+    plt.savefig(f'cost_plot_{acti_func.__name__}_1.png', dpi=150)
     plt.clf()
 
 def R2_plot_SGD(n_epochs, n_minibatches, R2_SGD_train, R2_SGD_test, acti_func):
@@ -129,15 +131,15 @@ def R2_plot_SGD(n_epochs, n_minibatches, R2_SGD_train, R2_SGD_test, acti_func):
     plt.plot(iters, R2_SGD_test, zorder=100, label=r'Test R2 score')
     plt.plot(iters, R2_SGD_train, zorder=5, label=r'Train R2 score')
     plt.yscale('log')
-    plt.title(r'\bf{R2 score as Function of Iteration - SGD w/ Adam}', pad=15)
+    plt.title(fr'R2 score as Function of Iteration - SGD, Adam and {acti_func.__name__}', pad=15)
     plt.xlabel(fr'Iterations: (number of epochs = {n_epochs}, number of batches {n_minibatches})', labelpad=10)
     plt.ylabel(r'R2 score (log-scale)', labelpad=10)
     plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
     plt.tight_layout()
-    plt.savefig(f'R2_plot_NN_Franke_B{n_seeds}_LR{init_LR}_{acti_func}.png', dpi=150)
+    plt.savefig(f'R2_plot_{acti_func.__name__}_1.png', dpi=150)
     plt.clf()
 
-def FF_plot(ANN_GD, acti_func):
+def FF_plot(X, Y, z, z_diff, acti_func):
     plt.rcParams.update({
     "text.usetex": True,
     "font.family": "serif",
@@ -148,17 +150,6 @@ def FF_plot(ANN_GD, acti_func):
         axisbelow=True, grid=True)
     plt.rc('grid', color='w', linestyle='solid')
     plt.rc('lines', linewidth=1)
-
-    """ Make Surface Data """
-    x = np.linspace(0, 1, 50).reshape(-1,1)
-    y = np.linspace(0, 1, 50).reshape(-1,1)
-    X, Y = np.meshgrid(x, y)
-    X_ = X.flatten().reshape(-1, 1)
-    Y_ = Y.flatten().reshape(-1, 1)
-    i = np.c_[X_, Y_]
-    z = fwd(ANN_GD, i)[0]
-    z = z.reshape(50, 50)
-    z_diff = abs(z - Z_no_noise)
 
     # fig.patch.set_facecolor('whitesmoke')
     fig = plt.figure()
@@ -175,7 +166,7 @@ def FF_plot(ANN_GD, acti_func):
     # cset = ax.contourf(x, y, z, zdir='y', offset=1.1, alpha=0.3, cmap=cm.Oranges)
     # ax.plot_surface(X_no_noise, Y_no_noise, Z_no_noise, rstride=8, cstride=8, alpha=0.7, cmap="Blues")
 
-    ax.plot_surface(X, Y, z, alpha=0.8, cmap="cool")
+    ax.plot_surface(X, Y, z, alpha=1, cmap="cool")
 
     cset = ax.contourf(X, Y, z_diff, zdir='z', offset=-0.79, cmap='winter')
     
@@ -183,7 +174,7 @@ def FF_plot(ANN_GD, acti_func):
     cbar = fig.colorbar(cset, pad=0.1, shrink=0.5, cax = cbaxes, ticks=[np.min(z_diff), np.max(z_diff)/2, np.max(z_diff)])
     cbar.ax.set_ylabel(r'Absolute Distance')
     cbar.ax.yaxis.set_label_position('left')
-    ax.set_title(r'\bf{Franke Function Surface Plot - NN w/ SGD and Adam}', y=0.96)
+    ax.set_title(fr'Franke Function Surface Plot - NN w/ SGD, Adam and {acti_func.__name__}', y=0.96)
     ax.set_xlabel(r'x values', labelpad=15)
     ax.set_ylabel(r'y values', labelpad=15)
     ax.set_xticks([0.0, 0.5, 1.0])
@@ -194,8 +185,9 @@ def FF_plot(ANN_GD, acti_func):
     ax.set_ylim(-0.1, 1.1)
     ax.set_zlabel(r'Franke Funcrion', labelpad=10)
     ax.tick_params(axis='both', which='major')
-    ax.view_init(elev=13, azim=-24)
-    plt.savefig(f'surface_plot_NN_Franke_w_diff_proj_B{n_seeds}_LR{init_LR}_{acti_func}.png', dpi=150)
+    ax.view_init(elev=15, azim=-30)
+    plt.savefig(f'surface_plot_{acti_func.__name__}_1.png', dpi=150)
+    # plt.show()
     plt.clf()
 
 """ Func to find best minibatch size """
@@ -223,11 +215,14 @@ def find_minibatch_size_SDG(input_train, z_train, input_test, z_test, n_nodes_in
         acti_func(),
         Layer(best_n_nodes_cost, best_n_nodes_cost),
         acti_func(),
+        Layer(best_n_nodes_cost, best_n_nodes_cost),
+        acti_func(),
         Layer(best_n_nodes_cost, n_nodes_outputLayer),
         Linear_Activation()
         ]
 
         mse_SGD_train, mse_SGD_test, R2_SGD_train, R2_SGD_test = train_NN_SGD(ANN_SGD, input_train, z_train, input_test, z_test, n_epochs, init_LR, decay, O_M, momentum, minibatch_size, n_minibatches, seed, best_lambda_cost, method)
+
 
         cost_minibatch[mb_idx] = mse_SGD_test[-1]
 
@@ -256,19 +251,34 @@ if __name__=='__main__':
 
     n_nodes_inputLayer = input_train.shape[1]
     n_nodes_outputLayer = z_train.shape[1]
-
+    print(np.shape(x_train)[0])
+    
     """ Hyperparameters """
-    n_epochs = 100                                     # Number of epochs
-    init_LR = 0.15                                      # Initial learning rate (LR)
+    n_epochs = 10                                     # Number of epochs
+    init_LR = 0.01                                      # Initial learning rate (LR)
     decay = 0.0                                         # init_LR/n_epochs # LR decay rate (for fixed LR set decay to 0)
     momentum = 0.0                                      # Momentum value for GD and SGD.
-    minibatch_size = int(np.floor(np.shape(x_train)[0] * 0.005))
+    minibatch_size = int(np.floor(x_train.shape[0] * 0.005)) # 0.5% of the train data-set
     n_minibatches =  x_train.shape[0]//minibatch_size   # number of minibatches
-    # N_iter_GD = n_epochs*n_minibatches                # Number of iterations for GD
-    lambda_min, lambda_max = -16, -2                    # Lambda search space
-    nlambdas = 8                                        # Number of lambdas
+    lambda_min, lambda_max = -15, 1                    # Lambda search space
+    nlambdas = 9                                        # Number of lambdas
     n_seeds = 3                                         # Number of seeds to achieve an average cost
-    print('minibatch_size', minibatch_size, 'n_minibatches', n_minibatches)
+    B = 100
+
+    iters = n_minibatches*n_epochs
+    cost_SGD_train_mean = np.empty((iters, B))
+    cost_SGD_test_mean = np.empty((iters, B))
+    R2_SGD_train_mean = np.empty((iters, B))
+    R2_SGD_test_mean = np.empty((iters, B))
+
+
+    print('\n')
+    print('n_epochs = ', n_epochs)
+    print('init_LR = ', init_LR)
+    print('minibatch_size = ', minibatch_size)
+    print('n_minibatches = ', n_minibatches)
+    print('\n')
+    
     """ Optimization Method """
     # If you want plain GD without any optimization choose 'momentum' with momentum value of 0
     Optimizer_method = ['Adam','momentum'] # Adagrad and RMSprop not yet implemented 
@@ -278,37 +288,66 @@ if __name__=='__main__':
     problem_method = ['Regg', 'Class']
     method = problem_method[0]
 
+
     """ PLOTS: """
     # Possible activation functions are Linear_Activation, Sigmoid, ReLU, LeakyReLU, Hyperbolic, ELU and Sin
-    activation_functions = [Sigmoid, Hyperbolic, ReLU, LeakyReLU, ELU]
-    for acti_func in activation_functions:
+    acti_func = LeakyReLU
+    best_n_nodes_cost, best_lambda_cost = cost_heatmap(X, Y, Z, n_epochs, init_LR, decay, O_M, momentum, minibatch_size, n_minibatches, lambda_min, lambda_max, nlambdas, n_seeds, acti_func)
 
-        best_n_nodes_cost, best_lambda_cost = cost_heatmap(X, Y, Z, n_epochs, init_LR, decay, O_M, momentum, minibatch_size, n_minibatches, lambda_min, lambda_max, nlambdas, n_seeds, acti_func)
 
-        """ The Neural Network """
-        ANN_SGD = [
+    """ Make Surface Data """
+    x = np.linspace(0, 1, 50).reshape(-1,1)
+    y = np.linspace(0, 1, 50).reshape(-1,1)
+    X, Y = np.meshgrid(x, y)
+    X_ = X.flatten().reshape(-1, 1)
+    Y_ = Y.flatten().reshape(-1, 1)
+    i = np.c_[X_, Y_]
+    z = np.zeros(50*50).reshape(-1, 1)
+
+    """ The Neural Network """
+    ANN_SGD = [
         Layer(n_nodes_inputLayer, best_n_nodes_cost),
+        acti_func(),
+        Layer(best_n_nodes_cost, best_n_nodes_cost),
         acti_func(),
         Layer(best_n_nodes_cost, best_n_nodes_cost),
         acti_func(),
         Layer(best_n_nodes_cost, n_nodes_outputLayer),
         Linear_Activation()
-        ]
+    ]
 
+    # best_minibatch_size = find_minibatch_size_SDG(input_train, z_train, input_test, z_test, n_nodes_inputLayer, n_nodes_outputLayer, best_n_nodes_cost, best_lambda_cost, n_epochs, init_LR, decay, O_M, momentum, seed, method)
+    for b in range(B):
         """ Traning the Network """
-        cost_SGD_train, cost_SGD_test, R2_SGD_train, R2_SGD_test = train_NN_SGD(ANN_SGD, input_train, z_train, input_test, z_test, n_epochs, init_LR, decay, O_M, momentum, minibatch_size, n_minibatches, seed, best_lambda_cost, method)
+        cost_SGD_train_, cost_SGD_test_, R2_SGD_train_, R2_SGD_test_ = train_NN_SGD(ANN_SGD, input_train, z_train, input_test, z_test, n_epochs, init_LR, decay, O_M, momentum, minibatch_size, n_minibatches, seed, best_lambda_cost, method)
+        # cost_SGD_train, cost_SGD_test, R2_SGD_train, R2_SGD_test = train_NN_GD(ANN_SGD, x_train, y_train, x_test, y_test, n_epochs, init_LR, decay, O_M, momentum, best_lambda_cost, method)
+        
+        cost_SGD_train_mean[:,b] += cost_SGD_train_
+        cost_SGD_test_mean[:,b] += cost_SGD_test_
+        R2_SGD_train_mean[:,b] += R2_SGD_train_
+        R2_SGD_test_mean[:,b] += R2_SGD_test_
+        
+        output = fwd(ANN_SGD, i)[0]
+        z += output
 
-        # best_minibatch_size = find_minibatch_size_SDG(input_train, z_train, input_test, z_test, n_nodes_inputLayer, n_nodes_outputLayer, best_n_nodes_cost, best_lambda_cost, n_epochs, init_LR, decay, O_M, momentum, seed, method)
+    z /= B
+    z = z.reshape(50, 50)
+    z_diff = abs(z - Z_no_noise)
 
-        """ Forward => Applying Weights and Biases  """
-        y_pred_SGD = fwd(ANN_SGD, input_test)[0]
+    cost_SGD_train = np.mean(cost_SGD_train_mean, axis=1)
+    cost_SGD_test = np.mean(cost_SGD_test_mean, axis=1) 
+    R2_SGD_train = np.mean(R2_SGD_train_mean, axis=1)
+    R2_SGD_test = np.mean(R2_SGD_test_mean, axis=1)
 
-        """ Plotting the cost """
-        cost_plot_SGD(n_epochs, n_minibatches, cost_SGD_train, cost_SGD_test, acti_func)
+    """ Forward => Applying Weights and Biases  """
+    y_pred_SGD = fwd(ANN_SGD, input_test)[0]
 
-        """ Plotting the R2 score """
-        R2_plot_SGD(n_epochs, n_minibatches, R2_SGD_train, R2_SGD_test, acti_func)
-    
-        """ Plotting the Surface Plot """
-        FF_plot(ANN_SGD, acti_func)
+    """ Plotting the cost """
+    cost_plot_SGD(n_epochs, n_minibatches, cost_SGD_train, cost_SGD_test, acti_func)
+
+    """ Plotting the R2 score """
+    R2_plot_SGD(n_epochs, n_minibatches, R2_SGD_train, R2_SGD_test, acti_func)
+
+    """ Plotting the Surface Plot """
+    FF_plot(X, Y, z, z_diff, acti_func)
 

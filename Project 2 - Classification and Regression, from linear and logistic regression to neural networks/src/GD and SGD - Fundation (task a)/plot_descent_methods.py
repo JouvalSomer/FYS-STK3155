@@ -19,8 +19,8 @@ plt.rcParams.update({
 def find_lambda_DG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min, lambda_max, nlambdas, max_polydeg, plot, n_epochs, seed):
 
     lambdas = np.logspace(lambda_min, lambda_max, nlambdas)
-    polydeg = np.arange(max_polydeg + 1)
-    cost_lambda_degree = np.empty((nlambdas, max_polydeg + 1))
+    polydeg = np.arange(max_polydeg)
+    cost_lambda_degree = np.empty((nlambdas, max_polydeg))
 
     """ Hyperparameters """
     init_LR = 0.1                          # Initial learning rate (LR)
@@ -45,7 +45,7 @@ def find_lambda_DG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min,
     best_poly_deg_cost = polydeg[index[0,1]]
     best_lambda_cost = lambdas[index[0,0]]
 
-    print(f'The lowest cost with GD was achieved at polynomial gedree = {best_poly_deg_cost}, and with lambda = {best_lambda_cost}.')
+    print(f'The lowest cost with GD was achieved at polynomial degree = {best_poly_deg_cost}, and with lambda = {best_lambda_cost}.')
 
     if plot:
         fig, ax = plt.subplots(figsize=(14,8))
@@ -54,7 +54,7 @@ def find_lambda_DG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min,
         annot=True, annot_kws={"size": 20},
         fmt="1.4f", linewidths=1, linecolor=(30/255,30/255,30/255,1),
         cbar_kws={"orientation": "horizontal", "shrink":0.8, "aspect":40, "label":r"Cost", "pad":0.05})
-        x_idx = np.arange(max_polydeg) + 0.5
+        x_idx = np.arange(max_polydeg-1) + 0.5
         y_idx = np.arange(nlambdas) + 0.5
         ax.set_xticks(x_idx, [deg for deg in polydeg[1:]], fontsize='medium')
         ax.set_yticks(y_idx, [float(f'{lam:1.1E}') for lam in lambdas], rotation=0, fontsize='medium')
@@ -83,7 +83,7 @@ def find_lambda_DG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min,
         ax.scatter(x_test, y_predict_GD, c='limegreen', s=5, label=r'GD')
         # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
         ax.plot(x, y_true, zorder=100, c='black', label='True y')
-        ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.2, label='Data') # Data
+        ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
         ax.set_title(r'\bf{Regression line plot for plain GD}', pad=15)
         ax.set_xlabel(r'$x$', labelpad=10)
         ax.set_ylabel(r'$y$',  labelpad=10)
@@ -96,7 +96,7 @@ def find_lambda_DG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min,
         iters = np.arange(n_epochs)
         fig, ax = plt.subplots(figsize=(16,9))
         fig.subplots_adjust(bottom=0.22)
-        ax.plot(iters, train_cost_GD, color='crimson', lw=2, label=r"Train Cost for GD") #zorder=0,
+        ax.plot(iters, train_cost_GD, color='crimson', zorder=100, lw=2, label=r"Train Cost for GD") #zorder=0,
         ax.plot(iters, test_cost_GD, color='royalblue', lw=2, label=r"Test Cost for GD") #zorder=0,
         # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
         ax.set_xlabel(r"Iterations", labelpad=10)
@@ -115,8 +115,8 @@ def find_lambda_DG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min,
 def find_lambda_SDG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min, lambda_max, nlambdas, max_polydeg, plot, n_epochs, seed):
 
     lambdas = np.logspace(lambda_min, lambda_max, nlambdas)
-    polydeg = np.arange(max_polydeg + 1)
-    cost_lambda_degree = np.empty((nlambdas, max_polydeg + 1))
+    polydeg = np.arange(max_polydeg)
+    cost_lambda_degree = np.empty((nlambdas, max_polydeg))
 
     """ Hyperparameters """
     init_LR = 0.1                          # Initial learning rate (LR)
@@ -143,7 +143,7 @@ def find_lambda_SDG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min
     best_poly_deg_cost = polydeg[index[0,1]]
     best_lambda_cost = lambdas[index[0,0]]
 
-    print(f'The lowest cost with SGD was achieved at polynomial gedree = {best_poly_deg_cost}, and with lambda = {best_lambda_cost}.')
+    print(f'The lowest cost with SGD was achieved at polynomial degree = {best_poly_deg_cost}, and with lambda = {best_lambda_cost}.')
 
     if plot:
         fig, ax = plt.subplots(figsize=(14,8))
@@ -152,7 +152,7 @@ def find_lambda_SDG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min
         annot=True, annot_kws={"size": 20},
         fmt="1.4f", linewidths=1, linecolor=(30/255,30/255,30/255,1),
         cbar_kws={"orientation": "horizontal", "shrink":0.8, "aspect":40, "label":r"Cost", "pad":0.05})
-        x_idx = np.arange(max_polydeg) + 0.5
+        x_idx = np.arange(max_polydeg-1) + 0.5
         y_idx = np.arange(nlambdas) + 0.5
         ax.set_xticks(x_idx, [deg for deg in polydeg[1:]], fontsize='medium')
         ax.set_yticks(y_idx, [float(f'{lam:1.1E}') for lam in lambdas], rotation=0, fontsize='medium')
@@ -181,7 +181,7 @@ def find_lambda_SDG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min
         ax.scatter(x_test, y_predict_SGD, c='limegreen', s=5, label=r'SGD')
         # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
         ax.plot(x, y_true, zorder=100, c='black', label='True y')
-        ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.2, label='Data') # Data
+        ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
         ax.set_title(r'\bf{Regression line plot for plain SGD}', pad=15)
         ax.set_xlabel(r'$x$', labelpad=10)
         ax.set_ylabel(r'$y$',  labelpad=10)
@@ -194,7 +194,7 @@ def find_lambda_SDG(x_train, x_test, y_train, y_test, x, y_true, G_M, lambda_min
         iters = np.arange(n_epochs*n_minibatches)
         fig, ax = plt.subplots(figsize=(16,9))
         fig.subplots_adjust(bottom=0.22)
-        ax.plot(iters, train_cost_SGD, color='crimson', lw=2, label=r"Train Cost for SGD") #zorder=0,
+        ax.plot(iters, train_cost_SGD, color='crimson', zorder=100, lw=2, label=r"Train Cost for SGD") #zorder=0,
         ax.plot(iters, test_cost_SGD, color='royalblue', lw=2, label=r"Test Cost for SGD") #zorder=0,
         # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
         ax.set_xlabel(r"Iterations", labelpad=10)
@@ -238,7 +238,7 @@ def find_minibatch_size_SDG(x_train, x_test, y_train, y_test, best_poly_deg_SGD,
 
     index = np.argwhere(cost_minibatch == np.min(cost_minibatch))
     best_minibatch_size = minibatchs[index[0,0]]
-    
+
     minibatch_size = np.shape(x_train)[0]//best_minibatch_size
     n_minibatches = np.shape(x_train)[0]//minibatch_size #number of minibatches
 
@@ -276,7 +276,7 @@ def fixed_LR(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg_GD, best
     iters = np.arange(n_epochs*n_minibatches)
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.plot(iters, test_cost_GD, color='crimson', lw=2, label=r"Cost for the test data - GD") #zorder=0,
+    ax.plot(iters, test_cost_GD, color='crimson', lw=2, zorder=100, label=r"Cost for the test data - GD") #zorder=0,
     ax.plot(iters, test_cost_SGD, color='royalblue', lw=2, label=r"Cost for the test data - SGD") #zorder=0,
     # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
     ax.set_xlabel(r"Iterations", labelpad=10)
@@ -292,11 +292,11 @@ def fixed_LR(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg_GD, best
     """ Regression line plot """
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     ax.scatter(x_test, y_predict_SGD, c='limegreen', s=5, label='SGD')
+    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
     ax.plot(x, y_true, zorder=100, c='black', label='True y')
-    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.05, label='Data') # Data
+    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
     ax.set_title(r'\bf{Regression line plot for fixed LR}', pad=15)
     ax.set_xlabel(r'$x$', labelpad=10)
     ax.set_ylabel(r'$y$',  labelpad=10)
@@ -337,7 +337,7 @@ def fixed_LR_momentum(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg
     iters = np.arange(n_epochs*n_minibatches)
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.plot(iters, test_cost_GD, color='crimson', lw=2, label=r"Cost for the test data - GD") #zorder=0,
+    ax.plot(iters, test_cost_GD, color='crimson', lw=2, zorder=100, label=r"Cost for the test data - GD") #zorder=0,
     ax.plot(iters, test_cost_SGD, color='royalblue', lw=2, label=r"Cost for the test data - SGD") #zorder=0,
     # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
     ax.set_xlabel(r"Iterations", labelpad=10)
@@ -353,11 +353,11 @@ def fixed_LR_momentum(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg
     """ Regression line plot """
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     ax.scatter(x_test, y_predict_SGD, c='limegreen', s=5, label='SGD')
+    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
     ax.plot(x, y_true, zorder=100, c='black', label='True y')
-    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.05, label='Data') # Data
+    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
     ax.set_title(r'\bf{Regression line plot for fixed LR and momentum}', pad=15)
     ax.set_xlabel(r'$x$', labelpad=10)
     ax.set_ylabel(r'$y$',  labelpad=10)
@@ -398,8 +398,8 @@ def adaptive_LR_momentum(x_train, x_test, y_train, y_test, x, y_true, best_poly_
     iters = np.arange(n_epochs*n_minibatches)
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.plot(iters, test_cost_GD, color='crimson', lw=2, label=r"Cost for the test data - GD") #zorder=0,
     ax.plot(iters, test_cost_SGD, color='royalblue', lw=2, label=r"Cost for the test data - SGD") #zorder=0,
+    ax.plot(iters, test_cost_GD, color='crimson', lw=2, zorder=100, label=r"Cost for the test data - GD") #zorder=0,
     # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
     ax.set_xlabel(r"Iterations", labelpad=10)
     ax.set_ylabel(r"Cost", labelpad=10)
@@ -414,11 +414,11 @@ def adaptive_LR_momentum(x_train, x_test, y_train, y_test, x, y_true, best_poly_
     """ Regression line plot """
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     ax.scatter(x_test, y_predict_SGD, c='limegreen', s=5, label='SGD')
+    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
     ax.plot(x, y_true, zorder=100, c='black', label='True y')
-    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.05, label='Data') # Data
+    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
     ax.set_title(r'\bf{Regression line plot for adaptive LR and momentum}', pad=15)
     ax.set_xlabel(r'$x$', labelpad=10)
     ax.set_ylabel(r'$y$',  labelpad=10)
@@ -459,8 +459,8 @@ def Adagrad_w_momentum(x_train, x_test, y_train, y_test, x, y_true, best_poly_de
     iters = np.arange(n_epochs*n_minibatches)
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.plot(iters, test_cost_GD, color='crimson', lw=2, label=r"Cost for the test data - GD") #zorder=0,
     ax.plot(iters, test_cost_SGD, color='royalblue', lw=2, label=r"Cost for the test data - SGD") #zorder=0,
+    ax.plot(iters, test_cost_GD, color='crimson', lw=2, zorder=100, label=r"Cost for the test data - GD") #zorder=0,
     # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
     ax.set_xlabel(r"Iterations", labelpad=10)
     ax.set_ylabel(r"Cost", labelpad=10)
@@ -475,11 +475,11 @@ def Adagrad_w_momentum(x_train, x_test, y_train, y_test, x, y_true, best_poly_de
     """ Regression line plot """
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     ax.scatter(x_test, y_predict_SGD, c='limegreen', s=5, label='SGD')
+    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
     ax.plot(x, y_true, zorder=100, c='black', label='True y')
-    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.05, label='Data') # Data
+    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
     ax.set_title(r'\bf{Regression line plot for Adagrad w/ momentum}', pad=15)
     ax.set_xlabel(r'$x$', labelpad=10)
     ax.set_ylabel(r'$y$',  labelpad=10)
@@ -520,8 +520,8 @@ def Adagrad_w_o_momentum(x_train, x_test, y_train, y_test, x, y_true, best_poly_
     iters = np.arange(n_epochs*n_minibatches)
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.plot(iters, test_cost_GD, color='crimson', lw=2, label=r"Cost for the test data - GD") #zorder=0,
     ax.plot(iters, test_cost_SGD, color='royalblue', lw=2, label=r"Cost for the test data - SGD") #zorder=0,
+    ax.plot(iters, test_cost_GD, color='crimson', lw=2, zorder=100, label=r"Cost for the test data - GD") #zorder=0,
     # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
     ax.set_xlabel(r"Iterations", labelpad=10)
     ax.set_ylabel(r"Cost", labelpad=10)
@@ -536,11 +536,11 @@ def Adagrad_w_o_momentum(x_train, x_test, y_train, y_test, x, y_true, best_poly_
     """ Regression line plot """
     fig, ax = plt.subplots(figsize=(16,9))
     fig.subplots_adjust(bottom=0.22)
-    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     ax.scatter(x_test, y_predict_SGD, c='limegreen', s=5, label='SGD')
+    ax.scatter(x_test, y_predict_GD, c='crimson', s=5,label='GD')
     # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
     ax.plot(x, y_true, zorder=100, c='black', label='True y')
-    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.05, label='Data') # Data
+    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
     ax.set_title(r'\bf{Regression line plot for Adagrad w/ no momentum}', pad=15)
     ax.set_xlabel(r'$x$', labelpad=10)
     ax.set_ylabel(r'$y$',  labelpad=10)
@@ -564,9 +564,12 @@ def optim_plot_SGD(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg_SG
     X_test_SGD = designMatrix_1D(x_test, best_poly_deg_SGD) # Test design matrix for SGD
 
 
-    Optimizer_method = ['Adagrad', 'RMSprop', 'Adam','momentum']
-    colors_SGD = ['forestgreen', 'crimson', 'royalblue', 'darkorange']
+    # Optimizer_method = ['Adagrad', 'RMSprop', 'Adam','momentum']
+    # colors_SGD = ['forestgreen', 'crimson', 'royalblue', 'darkorange']
 
+    Optimizer_method = ['RMSprop', 'Adagrad', 'Adam', 'momentum']
+    colors_SGD = ['crimson', 'forestgreen', 'royalblue', 'darkorange']
+    zor = [5, 10, 20, 50]
 
     iters = np.arange(n_epochs*n_minibatches)
 
@@ -582,7 +585,7 @@ def optim_plot_SGD(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg_SG
 
         y_predict_SGD, theta, test_cost_SGD, train_cost_SGD = SGD(X_train_SGD, X_test_SGD, y_train, y_test, O_M, G_M, minibatch_size, n_minibatches, n_epochs, init_LR, decay, momentum, seed, best_lambda_SGD)
 
-        ax.plot(iters, test_cost_SGD, c=colors_SGD[idx], lw=2, label=fr"Cost - SGD using {O_M}") #zorder=0,
+        ax.plot(iters, test_cost_SGD, c=colors_SGD[idx], zorder=zor[idx], lw=2, label=fr"Cost - SGD using {O_M}") #zorder=0,
 
     # ax.plot(iters, test_cost_SGD, color='royalblue', lw=2, label=r"Cost for the test data - SGD") #zorder=0,
     # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
@@ -607,7 +610,7 @@ def optim_plot_SGD(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg_SG
 
     # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
     ax.plot(x, y_true, zorder=100, c='black', label='True y')
-    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.05, label='Data') # Data
+    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
     ax.set_title(r'\bf{Regression line plot for different optimizers - SGD}', pad=15)
     ax.set_xlabel(r'$x$', labelpad=10)
     ax.set_ylabel(r'$y$',  labelpad=10)
@@ -630,8 +633,9 @@ def optim_plot_GD(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg_GD,
     X_test_GD = designMatrix_1D(x_test, best_poly_deg_GD) # Test design matrix for GD
 
 
-    Optimizer_method = ['Adagrad', 'RMSprop', 'Adam','momentum']
-    colors_GD = ['forestgreen', 'crimson', 'royalblue', 'darkorange']
+    Optimizer_method = ['RMSprop', 'Adagrad', 'Adam','momentum']
+    colors_GD = ['crimson', 'forestgreen', 'royalblue', 'darkorange']
+
 
     iters = np.arange(n_epochs*n_minibatches)
 
@@ -650,8 +654,6 @@ def optim_plot_GD(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg_GD,
 
         ax.plot(iters, test_cost_GD, c=colors_GD[idx], lw=2, label=fr"Cost - GD using {O_M}") #zorder=0,
 
-    # ax.plot(iters, test_cost_GD, color='royalblue', lw=2, label=r"Cost for the test data - GD") #zorder=0,
-    # plt.scatter(best_poly_deg_GD, np.min(MSE_test), color='forestgreen', marker='x', zorder=100, s=150, label='Lowest MSE')
     ax.set_xlabel(r"Iterations", labelpad=10)
     ax.set_ylabel(r"Cost", labelpad=10)
     ax.set_title(r"\bf{Cost as function of iterations for different optimizers - GD}", pad=15)
@@ -671,9 +673,8 @@ def optim_plot_GD(x_train, x_test, y_train, y_test, x, y_true, best_poly_deg_GD,
 
         ax.scatter(x_test, y_predict_GD, c=colors_GD[idx], s=5, label=fr'GD using {O_M}')
 
-    # ax.scatter(x_test, y_predict_OLS, c='dodgerblue', s=5, label='OLS')
     ax.plot(x, y_true, zorder=100, c='black', label='True y')
-    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.05, label='Data') # Data
+    ax.scatter(x_train, y_train, c='indigo', marker='o', s=3, alpha=0.3, label='Data') # Data
     ax.set_title(r'\bf{Regression line plot for different optimizers - GD}', pad=15)
     ax.set_xlabel(r'$x$', labelpad=10)
     ax.set_ylabel(r'$y$',  labelpad=10)
@@ -705,7 +706,7 @@ if __name__=='__main__':
     max_polydeg = 3
 
     plot = True
-    n_epochs = 1200
+    n_epochs = 1000
     seed = 55
 
     """ Plots: """

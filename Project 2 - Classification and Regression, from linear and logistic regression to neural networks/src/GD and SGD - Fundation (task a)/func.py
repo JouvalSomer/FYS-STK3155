@@ -92,11 +92,7 @@ def cost_theta_diff(theta, X, y, lmb):
     n = X.shape[0]
     return lmb*theta - 2*X.T @(y - X@theta)/n
 
-
 def auto_gradient(theta, X, y, lmb):
-    print(theta.shape, X.shape, y.shape, lmb)
-    y.shape += (1,)
-    print(theta.shape, X.shape, y.shape, lmb)
     gradient = grad(cost_theta)
     return gradient(theta, X, y, lmb)
 

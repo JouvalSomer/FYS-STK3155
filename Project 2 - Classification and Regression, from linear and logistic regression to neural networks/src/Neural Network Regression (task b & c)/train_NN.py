@@ -21,7 +21,6 @@ def fwd_test(ANN, input):
             wei = weights
     return output, wei
 
-                
 def train_NN_GD(ANN, x_train, y_train, x_test, y_test, epochs, learning_rate, decay, O_M, momentum, lmb, method):
 
     """ Optimizer method """
@@ -64,8 +63,6 @@ def train_NN_GD(ANN, x_train, y_train, x_test, y_test, epochs, learning_rate, de
     R2_test = np.zeros(epochs)
     
     for epoch in range(epochs):
-        change_w = change_b = 0.0
-        count = 0
 
         # Forward:
         output_test, _ = fwd_test(ANN, x_test)
@@ -81,7 +78,8 @@ def train_NN_GD(ANN, x_train, y_train, x_test, y_test, epochs, learning_rate, de
 
         # Backward:
         grad = cost_grad(y_train, output, lmb, weights)
-
+        change_w = change_b = 0.0
+        count = 0
         for idx,layer in enumerate(reversed(ANN)):
             if O_M == 'momentum':
                 grad = layer.backward(grad, learning_rate, decay, O_M, momentum, epoch, change_w, change_b, optim_w, optim_b, lmb)

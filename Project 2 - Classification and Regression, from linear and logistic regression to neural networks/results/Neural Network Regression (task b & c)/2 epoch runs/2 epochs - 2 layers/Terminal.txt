@@ -1,0 +1,43 @@
+    activation_functions = [LeakyReLU, ReLU, Sigmoid, Hyperbolic, ELU]
+
+
+minibatch_size 10 n_minibatches 200
+3it [01:00, 20.10s/it]
+
+The lowest cost with SGD was achieved 50 nodes, and with lambda = 1e-15.
+
+The lowest cost was 0.015189826255977656.
+
+The highest R2 score was 0.8463823166670892.
+
+3it [00:54, 18.23s/it]
+
+The lowest cost with SGD was achieved 100 nodes, and with lambda = 1e-15.
+
+The lowest cost was 0.016861311542685085.
+
+The highest R2 score was 0.8294782590997414.
+
+3it [01:06, 22.03s/it]
+
+The lowest cost with SGD was achieved 10 nodes, and with lambda = 1e-11.
+
+The lowest cost was 0.03488799159816554.
+
+The highest R2 score was 0.6471709186908038.
+
+3it [01:05, 21.81s/it]
+
+The lowest cost with SGD was achieved 10 nodes, and with lambda = 1e-11.
+
+The lowest cost was 0.028489007935415804.
+
+The highest R2 score was 0.7118850917194551.
+
+3it [01:12, 24.24s/it]
+
+The lowest cost with SGD was achieved 10 nodes, and with lambda = 1e-09.
+
+The lowest cost was 0.03495764200230548.
+
+The highest R2 score was 0.6464665355505737.
