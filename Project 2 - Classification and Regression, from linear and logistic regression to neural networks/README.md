@@ -25,6 +25,7 @@ In the src folder you will find all the source files for this project. The files
     - logistic.py
     - logistic_hypersearch.py
     - train_NN_Class.py
+    - ANN_traning_log_SKLEARN.py
     - logistic_sklearn.py
 - #### Neural Network Regression (task b & c)
     - ANN_traning.py
