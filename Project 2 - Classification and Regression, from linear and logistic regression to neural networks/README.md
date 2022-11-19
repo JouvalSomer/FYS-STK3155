@@ -38,7 +38,9 @@ In the src folder you will find all the source files for this project. The files
 - #### results 
     -results for the various sub tasks in the project.
 
-Install all the required python packages using the requirements.txt files. Simply write the following line in your command line
+
+
+> Install all the required python packages using the requirements.txt files. Simply write the following line in your command line
 
 `pip3 install -r requirements.txt`
 
