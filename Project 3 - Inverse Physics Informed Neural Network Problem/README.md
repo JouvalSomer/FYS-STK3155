@@ -10,7 +10,7 @@ investigate the diffusive properties of a tracer molecule observed via MRI imagi
 for simplicity reasons use synthetically made simulated MRI-like images. Alongside the images we will apply the diffusion equation as our physical insight to solve the inverse problem of discovering the diffusion coefficient for this process.
 ---
 
-### In this GitHub repo you'll find two folders. One containing the source files and the data that was used, and one containing the results.
+### In this GitHub repo you'll find two folders. One folder, src, containing the source files and the data that was used, and one, results, containing the results.
 
 ## **Content of folders:**
 
