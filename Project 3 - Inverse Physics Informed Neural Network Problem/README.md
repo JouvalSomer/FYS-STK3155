@@ -36,10 +36,10 @@ to try to estimate the diffusion coefficient of the tracer.
     - And plots of the "true" MRI consentration images and the NNs predixtion of them.
 
 * ## results
-    This folder contains all the plotts described above-
+    This folder contains all the plotts described above.
 
 * ## data
     And this folder contains the two data-sets and their coresponding masks for region of interest selection (used for train/test splt).
 ---
 ## Requirements
-This project uses Pytorch. For documentation and installation guide [click here](https://pytorch.org/get-started/locally/). Additionally the package tqdm is used to get a progress-bar for the PINN traning. For documentation on tqem [click here](https://tqdm.github.io/). Furthermore the packages numpy and matplotlib are used.
+This project uses Pytorch. For documentation and installation guide [click here](https://pytorch.org/get-started/locally/ "Pytorch documentation"). Additionally the package tqdm is used to get a progress-bar for the PINN traning. For documentation on tqem [click here](https://tqdm.github.io/ "tqdm documentation"). Furthermore the packages numpy and matplotlib are used.
