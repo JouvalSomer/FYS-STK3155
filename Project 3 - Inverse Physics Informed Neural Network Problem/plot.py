@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 import torch
 
-from func import *
-
-
+from data import *
+from optim import *
 
 """ Plot losses during traning """
 def plot_total_losses(total_losses, dloss, pdeloss):
@@ -32,15 +31,12 @@ def D_plot(D_during_train):
     plt.savefig(f'results/D_plot_A.png')
     plt.clf()
 
-
 ''' Plot Simulated MRI images and predicted images '''
-def plot_MRI_images(u_nn):
+def plot_MRI_images(u_nn, train=False):
     dataset = "brain2dsmooth10"
-    path_to_data, roi = import_data(dataset)
+    path_to_data, roi = import_data(dataset, train)
     images = load_images(path_to_data, dataset)
-    # coordinate_grid = make_coordinate_grid(shape=len(images['00.00']))
     coordinate_grid = make_coordinate_grid(images)
-
     datadict = get_input_output_pairs(coordinate_grid, mask=roi, images=images)
     ts = get_timedata(path_to_data, dataset)
 
