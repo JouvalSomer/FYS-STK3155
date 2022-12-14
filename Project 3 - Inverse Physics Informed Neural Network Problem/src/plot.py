@@ -41,9 +41,9 @@ def plot_MRI_images(u_nn, train=False):
     images = load_images(path_to_data, dataset)
     coordinate_grid = make_coordinate_grid(images)
     datadict = get_input_output_pairs(coordinate_grid, mask=roi, images=images)
-    ts = get_timedata(path_to_data, dataset)
+    time_keys = get_timedata(coordinate_grid, roi, images)
 
-    for i,t in enumerate(ts):
+    for i,t in enumerate(time_keys):
         xyt = torch.tensor(datadict[t][0]).float()
         xyt_cpu = xyt.cpu()
 
