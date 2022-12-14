@@ -19,7 +19,7 @@ else:
 
 
 """     HYPERPARAMETERS     """
-max_epochs = 400
+max_epochs = 400 # Has to be greater than or equal to 10 
 n_pde = int(1e5) # Number of residual points
 D_init = 1.0 # Intial guess for the diff. coeff. D
 pde_w = 5 # PDE-weights
