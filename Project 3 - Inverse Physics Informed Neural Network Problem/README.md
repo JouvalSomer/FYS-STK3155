@@ -16,19 +16,19 @@ to try to estimate the diffusion coefficient of the tracer.
 ## **Content of folders:**
 
 * ## src
-  * PINN_main.py
+  * **PINN_main.py**
   
     This is the main script file that includes all the frontend. This inclues the the main hyperparameters.
-  * data.py
+  * **data.py**
   
     This file contains all the handling of the data. This includes import and scaling of the data, creation of the different grids and coordinats and making the input/output pairs for the PINN.
-  * network.py
+  * **network.py**
   
     This file houses the neural network class.
-  * optim.py
+  * **optim.py**
   
     In this file you'll find the losses and the optimization loop.
-  * plot.py
+  * **plot.py**
     
     And here is were all the plotting is done. This includes: 
     - A plot of the diffusion coeffition against epochs.
