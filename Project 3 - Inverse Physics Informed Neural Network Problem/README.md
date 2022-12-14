@@ -4,14 +4,13 @@
 ---
 ### Problem statment:
 > In hopes of getting a better understanding of the glymphatic system and to demonstrate the
-potential of PINNs we want in this study to apply a physics-informed neural network model to
+potential of PINNs we want to, in this study, apply a physics-informed neural network to
 investigate the diffusive properties of a tracer molecule observed via MRI imaging over a period of
 48 hours. Since it has been shown that PINNs struggle with noisy data (Zapf et al. 2022), we will
-for simplicity use synthetically made simulated MRI-like images alongside the diffusion equation
-to try to estimate the diffusion coefficient of the tracer.
+for simplicity reasons use synthetically made simulated MRI-like images. Alongside the images we will apply the diffusion equation as our physical insight to solve the inverse problem of discovering the diffusion coefficient for this process.
 ---
 
-### In this GitHub you'll find the source files, the data as well as the results for this project.
+### In this GitHub repo you'll find two folders. One containing the source files and the data that was used, and one containing the results.
 
 ## **Content of folders:**
 
@@ -34,12 +33,13 @@ to try to estimate the diffusion coefficient of the tracer.
     - A plot of the diffusion coeffition against epochs.
     - A plot of the total loss (NN loss + PDE loss) against epochs.
     - And plots of the "true" MRI consentration images and the NNs predixtion of them.
+    
+  * ## data
+       This folder contains the two data-sets used and masks for region of interest selection (used for train/test splt).
 
 * ## results
     This folder contains all the plotts described above.
 
-* ## data
-    And this folder contains the two data-sets and their coresponding masks for region of interest selection (used for train/test splt).
 ---
 ## Requirements
-This project uses Pytorch. For documentation and installation guide [click here](https://pytorch.org/get-started/locally/ "Pytorch documentation"). Additionally the package tqdm is used to get a progress-bar for the PINN traning. For documentation on tqem [click here](https://tqdm.github.io/ "tqdm documentation"). Furthermore the packages numpy and matplotlib are used.
+This project uses Pytorch. For documentation and installation guide [click here](https://pytorch.org/get-started/locally/ "Pytorch documentation"). Additionally, the package tqdm is used to get a progress-bar for the PINN traning. For documentation on tqem [click here](https://tqdm.github.io/ "tqdm documentation"). Furthermore, the packages numpy and matplotlib are used.
