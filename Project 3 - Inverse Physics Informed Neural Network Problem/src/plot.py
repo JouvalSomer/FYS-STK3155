@@ -10,6 +10,8 @@ os.makedirs('results', exist_ok=True)
 def plot_total_losses(total_losses, dloss, pdeloss):
     plt.rcParams.update({'figure.max_open_warning': 0})
     plt.figure(dpi = 200)
+    total_losses = torch.tensor(total_losses)
+    total_losses = total_losses.cpu()
     plt.semilogy(total_losses, label='total loss', linestyle='dashed', zorder=100)
     dloss = torch.tensor(dloss)
     dloss = dloss.cpu()

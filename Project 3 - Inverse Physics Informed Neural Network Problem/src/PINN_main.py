@@ -19,10 +19,10 @@ else:
 
 
 """     HYPERPARAMETERS     """
-max_epochs = 10 # Has to be greater than or equal to 10
+max_epochs = 1000 # Has to be greater than or equal to 10
 n_pde = int(1e5) # Number of residual points
 D_init = 1.0 # Intial guess for the diff. coeff. D
-pde_w = 5 # PDE-weights
+pde_w = 1.5 # PDE-weights
 
 sched_const = -0.5 # Schedular step-size factor. init_LR * 10^(sched_const * current_epoch/max_epochs)
 sched = False # Whether to use a schedular of not
@@ -47,13 +47,12 @@ D_param = torch.tensor(D_init, device=device, dtype=torch.float)
 D_param = torch.nn.Parameter(D_param)
 D_param = D_param.to(device)
 
-params = list(NN.parameters())
 
-# params = list(NN.parameters()) + [D_param] ?
 
 """ Set optimizer """
 # ADAM
 if optim == 'ADAM':
+    params = list(NN.parameters())
     optimizer = torch.optim.Adam([{'params': params, "lr" : learning_rate_NN},
                                 {'params': D_param, 'lr': learning_rate_D}])
 
@@ -70,6 +69,12 @@ if optim == 'ADAM':
 
 # L-BFGS
 if optim =='L-BFGS':
+    params = list(NN.parameters()) + [D_param]
+
+    D_during_train =[]
+    dloss = []
+    pdeloss = []
+    total_losses = []
     def closure():
         pde_points = init_collocation_points(input_list[0], tmax, tmin, num_points=n_pde)
         optimizer.zero_grad()
@@ -98,10 +103,14 @@ if optim =='L-BFGS':
         if total_loss.requires_grad:
             total_loss.backward()
             
+        # Log the diffusion coeff. to make a figure
+        D_during_train.append(D_param.item())
+
         # Log the losses to make figures
-        losses.append(total_loss.item())
+        total_losses.append(total_loss.item())
         dloss.append(data_loss_value.item())
         pdeloss.append(pde_loss_value.item())
+        
 
         if sched:
             scheduler.step()
@@ -110,16 +119,18 @@ if optim =='L-BFGS':
 
     optimizer = torch.optim.LBFGS(params,
                                     max_iter=max_epochs,
-                                    tolerance_grad=1e-7,
-                                    tolerance_change=1e-10,
+                                    tolerance_grad=1e-8,
+                                    tolerance_change=1e-12,
                                     line_search_fn="strong_wolfe")
 
     lr_lambda = lambda current_epoch: 10 ** (sched_const * current_epoch / max_epochs) # LR scheduler function
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
 
+
+
     print('Optimization loop has started with max epochs = ', max_epochs)
     start = time.time()
-    total_loss = optimizer.step(closure)
+    optimizer.step(closure)
     end = time.time()
     tot_time = end - start
     print('\nOptimization loop has ended. Total time used was:', str(datetime.timedelta(seconds=tot_time)), '\n')
@@ -131,7 +142,7 @@ T = 172800.0
 scaling_factor = L_squared / T
 
 D_during_train = np.array(D_during_train)*scaling_factor
-D_mean = sum(D_during_train[-100:])/100
+D_mean = sum(D_during_train[-50:])/50
 
 print('Started plotting and saving the figs. This may take a minute.')
 plot_total_losses(total_losses, dloss, pdeloss)

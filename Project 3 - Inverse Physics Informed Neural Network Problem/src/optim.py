@@ -3,20 +3,38 @@ import torch
 
 from data import *
 
-D_during_train =[]
-dloss = []
-pdeloss = []
-losses = []
+D_train_during_training =[]
+dloss_train = []
+pdeloss_train = []
+losses_train = []
+
+D_test_during_training =[]
+dloss_test = []
+pdeloss_test = []
+losses_test = []
+
+def test_NN(NN):
+    dataset = "brain2dsmooth10"
+    path_to_data, roi = import_data(dataset, train=False)
+    images = load_images(path_to_data, dataset)
+    coordinate_grid = make_coordinate_grid(images)
+    datadict = get_input_output_pairs(coordinate_grid, mask=roi, images=images)
+    ts = get_timedata(coordinate_grid, roi, images)
+    data_list, input_list = create_space_time_tensor(ts, datadict, data_list, input_list, using_gpu, spatial_dim)
+
+
 
 tmax = float(max(datadict.keys()))
 tmin = float(min(datadict.keys()))
 
 def data_loss(nn, input_list, data_list, loss_function):
     loss = 0.
+    count = 0
     for input_, data in zip(input_list, data_list):
+        count += 1
         predictions = torch.squeeze(nn(input_)) # Squeeze shape from (N,1) to (N)
         loss = loss + loss_function(predictions, data)
-    return loss
+    return loss/count
 
 def pde_loss_residual(coords, nn, D, loss_function):
         
@@ -90,15 +108,17 @@ def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, 
         # Backward pass, compute gradient w.r.t. weights and biases
         total_loss.backward()
         
-        # Log the diffusion coeff. to make a figure
-        D_during_train.append(D_param.item())
+        test_NN = NN()
 
-        # Log the losses to make figures
-        losses.append(total_loss.item())
-        dloss.append(data_loss_value.item())
-        pdeloss.append(pde_loss_value.item())
+        # Log the diffusion coeff. to make a figure
+        D_train_during_training.append(D_param.item())
+
+        # Log the losses_train to make figures
+        losses_train.append(total_loss.item())
+        dloss_train.append(data_loss_value.item())
+        pdeloss_train.append(pde_loss_value.item())
         
-        # Update the weights and biases
+        # Update the weights and biases 
         optimizer.step()
         if sched:
             scheduler.step()
@@ -109,6 +129,6 @@ def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, 
                 print('Loss = ',total_loss.item())
                 print(f"D = {D_param.item()}")
 
-    return D_during_train, losses, dloss, pdeloss
+    return D_train_during_training, losses_train, dloss_train, pdeloss_train
 
             

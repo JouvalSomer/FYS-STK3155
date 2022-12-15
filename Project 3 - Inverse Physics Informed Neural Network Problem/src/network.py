@@ -40,9 +40,14 @@ class Net(torch.nn.Module):
         Returns:
             [torch.Tensor]: [The NN output]
         """
+        # # Transform the shape of the Tensor to match what is expected by torch.nn.Linear
+        # if self.inputnormalization is not None:
+        #     x = InputNormalization(x)
         
         """ (n,) -> (n,1)  """
         x = torch.unsqueeze(x, 1) 
+
+        # x[..., -1] = x[..., -1] / tmax
     
         out = self.input_layer(x)
         
