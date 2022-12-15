@@ -33,9 +33,9 @@ for simplicity reasons use synthetically made simulated MRI-like images. Alongsi
     - A plot of the diffusion coeffition against epochs.
     - A plot of the total loss (NN loss + PDE loss) against epochs.
     - And plots of the "true" MRI consentration images and the NNs predixtion of them.
-    * **gravity_demo.py**
+   * **gravity_demo.py**
     
-    This is a test demo that verifies our PINN on known data so we can ensure that it works. Here we find the gravitational acceleration g from noisy mesurements of a throw without air resistance.
+     This is a test demo that verifies our PINN on known data so we can ensure that it works. Here we find the gravitational acceleration g from noisy mesurements of a throw without air resistance.
     
   * ## data
        This folder contains the two data-sets used and masks for region of interest selection (used for train/test splt).
