@@ -33,7 +33,7 @@ def D_plot(D_during_train):
     plt.clf()
 
 ''' Plot Simulated MRI images and predicted images '''
-def plot_MRI_images(u_nn, train=False):
+def plot_MRI_images(NN, train=False):
     os.makedirs('results/MRI_images', exist_ok=True)
 
     dataset = "brain2dsmooth10"
@@ -64,13 +64,13 @@ def plot_MRI_images(u_nn, train=False):
         plt.figure(dpi=200)
 
         xyt[:, -1] = float(t)
-        u_prediction=u_nn(xyt)
+        prediction=NN(xyt)
         
         xyt = xyt.cpu()
-        u_prediction = u_prediction.cpu()
+        prediction = prediction.cpu()
 
         plt.plot(xyt[:, 0], xyt[:, 1], marker=".", linewidth=0, markersize=0.1, color="k")
-        plt.scatter(xyt[:, 0], xyt[:, 1], c=np.squeeze(u_prediction.detach().numpy(),1), vmin=0., vmax=1.)
+        plt.scatter(xyt[:, 0], xyt[:, 1], c=np.squeeze(prediction.detach().numpy(),1), vmin=0., vmax=1.)
         
         plt.colorbar()
         plt.xlabel("x")

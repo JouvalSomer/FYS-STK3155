@@ -58,29 +58,35 @@ def pde_loss_residual(coords, nn, D, loss_function):
 
         return loss_function(residual, torch.zeros_like(residual))
 
-def optimization_loop(max_iters, u_nn, loss_function, D_param, pde_w, optimizer, reg, lmb, scheduler, sched=False, print_out=False, n_pde=int(1e5)):
+def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, reg, lmb, scheduler, sched=False, print_out=False, n_pde=int(1e5)):
     pde_points = init_collocation_points(input_list[0], tmax, tmin, num_points=n_pde)
     from tqdm import tqdm
-    for i in tqdm(range(max_iters)):
+    for i in tqdm(range(max_epochs)):
 
         # Free all intermediate values:
         optimizer.zero_grad() # Resetting the gradients to zeros
         
         # Forward pass for the data:
-        data_loss_value = data_loss(u_nn, input_list, data_list, loss_function)
+        data_loss_value = data_loss(NN, input_list, data_list, loss_function)
         
         # Forward pass for the PDE 
-        pde_loss_value = pde_loss_residual(pde_points, u_nn, D_param, loss_function)
+        pde_loss_value = pde_loss_residual(pde_points, NN, D_param, loss_function)
         
         total_loss = data_loss_value + pde_w * pde_loss_value
 
         if reg == 'L1': # Adding L1 regularization
             l1_penalty = torch.nn.L1Loss(reduction='sum') # size_average=False
-            reg_loss = 0
-            for param in u_nn.parameters():
-                reg_loss += l1_penalty(param, torch.zeros_like(param))
-            total_loss += lmb * reg_loss
+            l1_reg_loss = 0
+            for param in NN.parameters():
+                l1_reg_loss += l1_penalty(param, torch.zeros_like(param))
+            total_loss += lmb * l1_reg_loss
         
+        elif reg == 'L2':
+            l2_reg_term = 0
+            for param in NN.parameters():
+                l2_reg_term += torch.sum(param ** 2)
+            total_loss += lmb * l2_reg_term
+
         # Backward pass, compute gradient w.r.t. weights and biases
         total_loss.backward()
         
@@ -98,9 +104,11 @@ def optimization_loop(max_iters, u_nn, loss_function, D_param, pde_w, optimizer,
             scheduler.step()
         
         if print_out:
-            if i % int(max_iters/10) == 0:
+            if i % int(max_epochs/10) == 0:
                 print('iteration = ',i)
                 print('Loss = ',total_loss.item())
                 print(f"D = {D_param.item()}")
 
     return D_during_train, losses, dloss, pdeloss
+
+            
