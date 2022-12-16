@@ -17,7 +17,7 @@ for simplicity reasons use synthetically made simulated MRI-like images. Alongsi
 * ## src
   * **PINN_main.py**
   
-    This is the main script file that includes all the frontend. This inclues the the main hyperparameters.
+    This is the main script file that includes all the frontend. This inclues the the main hyperparameters, except for the two data-set and the two sizes for the data-sets.
   * **data.py**
   
     This file contains all the handling of the data. This includes import and scaling of the data, creation of the different grids and coordinats and making the input/output pairs for the PINN.
