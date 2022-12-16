@@ -15,6 +15,8 @@ else:
 spatial_dim = 2
 dataset = "brain2dsmooth10"
 
+torch.manual_seed(155)
+np.random.seed(155)
 
 def import_data(dataset, mask=True):
     path_to_data = os.getcwd() + "/data/"
@@ -151,13 +153,10 @@ def get_min_max_time():
 def init_collocation_points(coords, t_max, t_min, num_points=int(1e5)):
     with torch.no_grad():
         assert len(coords.shape) == 2
-        # print('coords: ', coords.shape)
-        # input()
-        torch.manual_seed(155) #Seed for rand. functions
+
         random_ints = torch.randint(high=coords.size(0), size=(num_points,), device=coords.device)    
         coords = coords[random_ints, :] # Choose random coords.
         
-        torch.manual_seed(155) #Seed for rand. functions
         a = (np.random.rand(coords.shape[0]))
         
         random_times = torch.from_numpy(a).to(coords.device)
