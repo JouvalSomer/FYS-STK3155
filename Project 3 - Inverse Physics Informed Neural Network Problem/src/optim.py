@@ -1,6 +1,6 @@
 
 import torch
-
+import copy
 from data import *
 
 D_train_during_training =[]
@@ -13,19 +13,7 @@ dloss_test = []
 pdeloss_test = []
 losses_test = []
 
-def test_NN(NN):
-    dataset = "brain2dsmooth10"
-    path_to_data, roi = import_data(dataset, train=False)
-    images = load_images(path_to_data, dataset)
-    coordinate_grid = make_coordinate_grid(images)
-    datadict = get_input_output_pairs(coordinate_grid, mask=roi, images=images)
-    ts = get_timedata(coordinate_grid, roi, images)
-    data_list, input_list = create_space_time_tensor(ts, datadict, data_list, input_list, using_gpu, spatial_dim)
-
-
-
-tmax = float(max(datadict.keys()))
-tmin = float(min(datadict.keys()))
+tmin, tmax = get_min_max_time()
 
 def data_loss(nn, input_list, data_list, loss_function):
     loss = 0.
@@ -37,8 +25,7 @@ def data_loss(nn, input_list, data_list, loss_function):
     return loss/count
 
 def pde_loss_residual(coords, nn, D, loss_function):
-        
-        assert isinstance(D, torch.nn.Parameter)
+        # assert isinstance(D, torch.nn.Parameter)
         assert coords.shape[-1] == 3, "array should have size N x 3"
         
         coords.requires_grad = True
@@ -77,47 +64,62 @@ def pde_loss_residual(coords, nn, D, loss_function):
         return loss_function(residual, torch.zeros_like(residual))
 
 def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, reg, lmb, scheduler, sched=False, print_out=False, n_pde=int(1e5)):
-    pde_points = init_collocation_points(input_list[0], tmax, tmin, num_points=n_pde)
+    
+    test_data_list, test_input_list = get_test_data()
+    train_data_list, train_input_list = get_train_data()
+
+    train_pde_points = init_collocation_points(train_input_list[0], tmax, tmin, num_points=n_pde)
+
     from tqdm import tqdm
     for i in tqdm(range(max_epochs)):
 
         # Free all intermediate values:
         optimizer.zero_grad() # Resetting the gradients to zeros
         
+        """ Train """
         # Forward pass for the data:
-        data_loss_value = data_loss(NN, input_list, data_list, loss_function)
-        
+        train_data_loss_value = data_loss(NN, train_input_list, train_data_list, loss_function)
         # Forward pass for the PDE 
-        pde_loss_value = pde_loss_residual(pde_points, NN, D_param, loss_function)
-        
-        total_loss = data_loss_value + pde_w * pde_loss_value
+        train_pde_loss_value = pde_loss_residual(train_pde_points, NN, D_param, loss_function)
+        train_total_loss = train_data_loss_value  + pde_w * train_pde_loss_value
+
+        """ Test """
+        with torch.no_grad():
+            # Forward pass for the data:
+            test_total_loss = data_loss(NN, test_input_list, test_data_list, loss_function)
+
 
         if reg == 'L1': # Adding L1 regularization
             l1_penalty = torch.nn.L1Loss(reduction='sum') # size_average=False
             l1_reg_loss = 0
             for param in NN.parameters():
                 l1_reg_loss += l1_penalty(param, torch.zeros_like(param))
-            total_loss += lmb * l1_reg_loss
+            train_total_loss += lmb * l1_reg_loss
         
-        elif reg == 'L2':
+        elif reg == 'L2': # Adding L2 regularization
             l2_reg_term = 0
             for param in NN.parameters():
                 l2_reg_term += torch.sum(param ** 2)
-            total_loss += lmb * l2_reg_term
+            train_total_loss += lmb * l2_reg_term
+
 
         # Backward pass, compute gradient w.r.t. weights and biases
-        total_loss.backward()
+        train_total_loss.backward()
         
-        test_NN = NN()
 
-        # Log the diffusion coeff. to make a figure
+        """ Train Log """
+        # Log the train diffusion coeff. to make a figure
         D_train_during_training.append(D_param.item())
-
-        # Log the losses_train to make figures
-        losses_train.append(total_loss.item())
-        dloss_train.append(data_loss_value.item())
-        pdeloss_train.append(pde_loss_value.item())
+        # Log the train losses to make figures
+        losses_train.append(train_total_loss.item())
+        dloss_train.append(train_data_loss_value.item())
+        pdeloss_train.append(train_pde_loss_value.item())
         
+        """ Test Log """
+        # Log the test losses to make figures
+        losses_test.append(test_total_loss.item())
+
+
         # Update the weights and biases 
         optimizer.step()
         if sched:
@@ -125,10 +127,10 @@ def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, 
         
         if print_out:
             if i % int(max_epochs/10) == 0:
-                print('iteration = ',i)
-                print('Loss = ',total_loss.item())
-                print(f"D = {D_param.item()}")
+                print('\nIteration = ',i)
+                print(f'Total traning loss = {train_total_loss.item():.4f}')
+                print(f"Diff. coeff. = {D_param.item()}")
 
-    return D_train_during_training, losses_train, dloss_train, pdeloss_train
+    return D_train_during_training, losses_train, dloss_train, pdeloss_train, D_test_during_training, losses_test, dloss_test, pdeloss_test
 
             

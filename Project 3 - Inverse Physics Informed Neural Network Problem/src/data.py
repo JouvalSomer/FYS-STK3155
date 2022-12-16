@@ -2,8 +2,6 @@ import os, glob
 import numpy as np
 import torch
 
-spatial_dim = 2
-
 """ Check if there is a GPU available """
 if torch.cuda.is_available():
     device = torch.device("cuda")
@@ -14,18 +12,20 @@ else:
     print("Using CPU")
     using_gpu = False
 
+spatial_dim = 2
+dataset = "brain2dsmooth10"
 
-data_list = []
-input_list = []
 
-def import_data(dataset, train):
+def import_data(dataset, mask=True):
     path_to_data = os.getcwd() + "/data/"
     brainmask = np.load(path_to_data + dataset +  "/masks/mask.npy")
     box = np.load(path_to_data + dataset +  "/masks/box.npy")
 
-    if train:
-        roi = np.logical_not(box) * brainmask # Apply the inverse mask (Traning set)
+    if mask:
+        roi = box * brainmask # Apply the mask (Test set)
+
     else:
+        box = np.full(box.shape, True)
         roi = box * brainmask # Apply the mask (Test set)
 
     return path_to_data, roi
@@ -55,10 +55,10 @@ def make_coordinate_grid(images):
 
 def get_input_output_pairs(coordinate_grid, mask, images):
     input_output_pairs = {}
-
+    true_time_keys = []
     xy = coordinate_grid[mask] # The mast alters the min and max values. So the grid is scaled again below
-
-    # Thise are made global because they are used to unscale the data outside this function
+   
+    # These are made global because they are used to unscale the data outside this function
     global input_max 
     global input_min 
     input_max = np.max(xy)
@@ -76,6 +76,7 @@ def get_input_output_pairs(coordinate_grid, mask, images):
         xyt_true_scaled = 2 * (xyt_true - true_min)/max_min_images - 1 # Scaling the true consentration
 
         timekey = float(timekey)
+        true_time_keys.append(timekey)
         scaled_timekey = round(2*(timekey)/(45.60) - 1, 4) # Scaling the time from 0 to 45.6 hours to -1, 1 
         xyt = np.zeros((xy_scaled.shape[0], 3))
         xyt[..., :2] = xy_scaled
@@ -83,15 +84,14 @@ def get_input_output_pairs(coordinate_grid, mask, images):
 
         input_output_pairs[scaled_timekey] = (xyt, xyt_true_scaled) 
 
-    return input_output_pairs
+    return input_output_pairs, true_time_keys
 
 def get_timedata(coordinate_grid, mask, images):
     """ Returns the scaled timekeys """
-    input_output_pairs = get_input_output_pairs(coordinate_grid, mask, images)
+    input_output_pairs = get_input_output_pairs(coordinate_grid, mask, images)[0]
     scaled_timekey = list(input_output_pairs.keys())
     return scaled_timekey 
 
-''' Create space-time tensor '''
 def create_space_time_tensor(ts, datadict, data_list, input_list, using_gpu, spatial_dim):
     for current_time in ts:
         xyt = torch.tensor(datadict[current_time][0]).float()
@@ -106,24 +106,53 @@ def create_space_time_tensor(ts, datadict, data_list, input_list, using_gpu, spa
         
         data_list.append(u_true)
         input_list.append(xyt)
+
     return data_list, input_list
 
+train_data_list = []
+train_input_list = []
 
-dataset = "brain2dsmooth10"
-path_to_data, roi = import_data(dataset, train=False)
+test_data_list = []
+test_input_list = []
+
+path_to_data, roi = import_data(dataset, mask=True)
 images = load_images(path_to_data, dataset)
 coordinate_grid = make_coordinate_grid(images)
-datadict = get_input_output_pairs(coordinate_grid, mask=roi, images=images)
-ts = get_timedata(coordinate_grid, roi, images)
-data_list, input_list = create_space_time_tensor(ts, datadict, data_list, input_list, using_gpu, spatial_dim)
+datadict = get_input_output_pairs(coordinate_grid, mask=roi, images=images)[0]
+time_keys = get_timedata(coordinate_grid, roi, images)
 
+def get_test_time_keys():
+    test_time_keys = time_keys[7::8] # 
+    return test_time_keys
 
+def get_train_time_keys():
+    time_keys.pop(7)
+    time_keys.pop(14)
+    train_time_keys = time_keys
+    return train_time_keys
 
+test_time_keys = get_test_time_keys()
+train_time_keys = get_train_time_keys()
+
+def get_test_data():
+    data_list, input_list = create_space_time_tensor(test_time_keys, datadict, test_data_list, test_input_list, using_gpu, spatial_dim)    
+    return data_list, input_list
+
+def get_train_data():
+    data_list, input_list = create_space_time_tensor(train_time_keys, datadict, train_data_list, train_input_list, using_gpu, spatial_dim)
+    return data_list, input_list
+
+def get_min_max_time():
+    tmax = float(max(datadict.keys()))
+    tmin = float(min(datadict.keys()))
+    return tmin, tmax
 
 ''' Residual points '''
 def init_collocation_points(coords, t_max, t_min, num_points=int(1e5)):
     with torch.no_grad():
         assert len(coords.shape) == 2
+        # print('coords: ', coords.shape)
+        # input()
         torch.manual_seed(155) #Seed for rand. functions
         random_ints = torch.randint(high=coords.size(0), size=(num_points,), device=coords.device)    
         coords = coords[random_ints, :] # Choose random coords.
