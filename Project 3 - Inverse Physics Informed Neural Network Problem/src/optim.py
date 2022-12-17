@@ -20,16 +20,16 @@ L_squared = 5648.0133
 T = 172800.0
 scaling_factor = L_squared / T
 
-def data_loss(nn, input_list, data_list, loss_function):
+def data_loss(nn, input_list, data_list, loss_function_NN):
     loss = 0.
     count = 0
     for input_, data in zip(input_list, data_list):
         count += 1
         predictions = torch.squeeze(nn(input_)) # Squeeze shape from (N,1) to (N)
-        loss = loss + loss_function(predictions, data)
+        loss = loss + loss_function_NN(predictions, data)
     return loss/count
 
-def pde_loss_residual(coords, nn, D, loss_function):
+def pde_loss_residual(coords, nn, D, loss_function_PDE):
         # assert isinstance(D, torch.nn.Parameter)
         assert coords.shape[-1] == 3, "array should have size N x 3"
         
@@ -66,9 +66,9 @@ def pde_loss_residual(coords, nn, D, loss_function):
 
         assert output.shape == residual.shape
 
-        return loss_function(residual, torch.zeros_like(residual))
+        return loss_function_PDE(residual, torch.zeros_like(residual))
 
-def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, reg, lmb, scheduler, sched=False, print_out=False, n_pde=int(1e5)):
+def optimization_loop(max_epochs, NN, loss_function_NN, loss_function_PDE, D_param, pde_w, optimizer, scheduler, sched=False, print_out=False, n_pde=int(1e5)):
     
     test_data_list, test_input_list = get_test_data()
     train_data_list, train_input_list = get_train_data()
@@ -83,29 +83,15 @@ def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, 
         
         """ Train """
         # Forward pass for the data:
-        train_data_loss_value = data_loss(NN, train_input_list, train_data_list, loss_function)
+        train_data_loss_value = data_loss(NN, train_input_list, train_data_list, loss_function_NN)
         # Forward pass for the PDE 
-        train_pde_loss_value = pde_loss_residual(train_pde_points, NN, D_param, loss_function)
+        train_pde_loss_value = pde_loss_residual(train_pde_points, NN, D_param, loss_function_PDE)
         train_total_loss = train_data_loss_value  + pde_w * train_pde_loss_value
 
         """ Test """
         with torch.no_grad():
             # Forward pass for the data:
-            test_total_loss = data_loss(NN, test_input_list, test_data_list, loss_function)
-
-
-        if reg == 'L1': # Adding L1 regularization
-            l1_penalty = torch.nn.L1Loss(reduction='sum') # size_average=False
-            l1_reg_loss = 0
-            for param in NN.parameters():
-                l1_reg_loss += l1_penalty(param, torch.zeros_like(param))
-            train_total_loss += lmb * l1_reg_loss
-        
-        elif reg == 'L2': # Adding L2 regularization
-            l2_reg_term = 0
-            for param in NN.parameters():
-                l2_reg_term += torch.sum(param ** 2)
-            train_total_loss += lmb * l2_reg_term
+            test_total_loss = data_loss(NN, test_input_list, test_data_list, loss_function_NN)
 
 
         # Backward pass, compute gradient w.r.t. weights and biases
@@ -139,7 +125,7 @@ def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, 
     return D_train_during_training_PINN, losses_train_PINN, dloss_train_PINN, pdeloss_train_PINN, losses_test_PINN
 
             
-def optimization_loop_NN_reg(max_epochs, NN, loss_function, optimizer, reg, lmb, scheduler, sched=False):
+def optimization_loop_NN_reg(max_epochs, NN, loss_function_NN, optimizer, scheduler, sched=False):
     
     test_data_list, test_input_list = get_test_data()
     train_data_list, train_input_list = get_train_data()
@@ -152,26 +138,12 @@ def optimization_loop_NN_reg(max_epochs, NN, loss_function, optimizer, reg, lmb,
         
         """ Train """
         # Forward pass for the data:
-        train_total_loss = data_loss(NN, train_input_list, train_data_list, loss_function)
+        train_total_loss = data_loss(NN, train_input_list, train_data_list, loss_function_NN)
 
         """ Test """
         with torch.no_grad():
             # Forward pass for the data:
-            test_total_loss = data_loss(NN, test_input_list, test_data_list, loss_function)
-
-
-        if reg == 'L1': # Adding L1 regularization
-            l1_penalty = torch.nn.L1Loss(reduction='sum') # size_average=False
-            l1_reg_loss = 0
-            for param in NN.parameters():
-                l1_reg_loss += l1_penalty(param, torch.zeros_like(param))
-            train_total_loss += lmb * l1_reg_loss
-        
-        elif reg == 'L2': # Adding L2 regularization
-            l2_reg_term = 0
-            for param in NN.parameters():
-                l2_reg_term += torch.sum(param ** 2)
-            train_total_loss += lmb * l2_reg_term
+            test_total_loss = data_loss(NN, test_input_list, test_data_list, loss_function_NN)
 
 
         # Backward pass, compute gradient w.r.t. weights and biases

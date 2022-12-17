@@ -32,17 +32,16 @@ learning_rate_D = 1e-2  # Initial learningrate for the PDE (the part that finds 
 
 optim = 'ADAM' # Optimzer. Choose between: 'ADAM' or 'L-BFGS'
 
-reg = None # Regularization. Choose between: None, 'L1', 'L2'
-lmb = 0 # Regularization parameter. Scales the regularization term
-
 print_out = True # Prints out the iteration, total loss and current diff. coeff. every 10% of max_epochs
 
 # Defining the NN:
 NN_PINN = Net(num_hidden_units=32, num_hidden_layers=5, inputs=3, inputnormalization=True).to(device)
-
 NN_ANN = Net(num_hidden_units=32, num_hidden_layers=5, inputs=3, inputnormalization=True).to(device)
 
-loss_function=torch.nn.MSELoss(reduction="mean") # Loss function. Choose between: MSELoss and L1Loss
+
+loss_function_NN =torch.nn.MSELoss(reduction="mean") # Loss function. Choose between: MSELoss and L1Loss
+loss_function_PDE =torch.nn.L1Loss(reduction="mean") # Loss function. Choose between: MSELoss and L1Loss
+
 
 # Making diff. coeff. D a learnable parameter
 D_param = torch.tensor(D_init, device=device, dtype=torch.float)
@@ -70,7 +69,7 @@ if optim == 'ADAM':
     print('Optimization loop for the PINN has started with max epochs = ', max_epochs)
     start = time.time()
     D_train_during_training, losses_train_PINN, dloss_train, pdeloss_train, losses_test_PINN = optimization_loop(max_epochs, \
-                                                                                NN_PINN, loss_function, D_param, pde_w, optimizerPINN, reg, lmb, \
+                                                                                NN_PINN, loss_function_NN, loss_function_PDE, D_param, pde_w, optimizerPINN, \
                                                                                 schedulerPINN, sched=sched, print_out=print_out, n_pde=n_pde)
     end = time.time()
     tot_time = end - start
@@ -78,7 +77,7 @@ if optim == 'ADAM':
     
     print('Optimization loop for the ANN has started with max epochs = ', max_epochs)
     start = time.time()
-    losses_train_ANN, losses_test_ANN = optimization_loop_NN_reg(max_epochs, NN_ANN, loss_function, optimizerANN, reg, lmb, schedulerANN, sched=False)
+    losses_train_ANN, losses_test_ANN = optimization_loop_NN_reg(max_epochs, NN_ANN, loss_function_NN, optimizerANN, schedulerANN, sched=False)
     end = time.time()
     tot_time = end - start
     print('\nOptimization loop for the ANN has ended. Total time used was:', str(datetime.timedelta(seconds=tot_time)), '\n')
@@ -109,29 +108,15 @@ if optim =='L-BFGS':
         
         """ Train """
         # Forward pass for the data:
-        train_data_loss_value = data_loss(NN_PINN, train_input_list, train_data_list, loss_function)
+        train_data_loss_value = data_loss(NN_PINN, train_input_list, train_data_list, loss_function_NN)
         # Forward pass for the PDE 
-        train_pde_loss_value = pde_loss_residual(train_pde_points, NN_PINN, D_param, loss_function)
+        train_pde_loss_value = pde_loss_residual(train_pde_points, NN_PINN, D_param, loss_function_PDE)
         train_total_loss = train_data_loss_value  + pde_w * train_pde_loss_value
 
         """ Test """
         with torch.no_grad():
             # Forward pass for the data:
-            test_total_loss = data_loss(NN_PINN, test_input_list, test_data_list, loss_function)
-
-
-        if reg == 'L1': # Adding L1 regularization
-            l1_penalty = torch.nn.L1Loss(reduction='sum') # size_average=False
-            l1_reg_loss = 0
-            for param in NN_PINN.parameters():
-                l1_reg_loss += l1_penalty(param, torch.zeros_like(param))
-            train_total_loss += lmb * l1_reg_loss
-        
-        elif reg == 'L2': # Adding L2 regularization
-            l2_reg_term = 0
-            for param in NN_PINN.parameters():
-                l2_reg_term += torch.sum(param ** 2)
-            train_total_loss += lmb * l2_reg_term
+            test_total_loss = data_loss(NN_PINN, test_input_list, test_data_list, loss_function_NN)
 
 
         # Backward pass, compute gradient w.r.t. weights and biases
