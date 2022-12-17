@@ -6,6 +6,7 @@ from data import *
 D_train_during_training_PINN =[]
 dloss_train_PINN = []
 pdeloss_train_PINN = []
+
 losses_train_PINN = []
 losses_test_PINN = []
 
