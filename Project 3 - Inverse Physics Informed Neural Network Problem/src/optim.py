@@ -3,17 +3,21 @@ import torch
 import copy
 from data import *
 
-D_train_during_training =[]
-dloss_train = []
-pdeloss_train = []
-losses_train = []
+D_train_during_training_PINN =[]
+dloss_train_PINN = []
+pdeloss_train_PINN = []
+losses_train_PINN = []
+losses_test_PINN = []
 
-D_test_during_training =[]
-dloss_test = []
-pdeloss_test = []
-losses_test = []
+
+losses_test_ANN = []
+losses_train_ANN = []
 
 tmin, tmax = get_min_max_time()
+
+L_squared = 5648.0133
+T = 172800.0
+scaling_factor = L_squared / T
 
 def data_loss(nn, input_list, data_list, loss_function):
     loss = 0.
@@ -109,15 +113,15 @@ def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, 
 
         """ Train Log """
         # Log the train diffusion coeff. to make a figure
-        D_train_during_training.append(D_param.item())
+        D_train_during_training_PINN.append(D_param.item())
         # Log the train losses to make figures
-        losses_train.append(train_total_loss.item())
-        dloss_train.append(train_data_loss_value.item())
-        pdeloss_train.append(train_pde_loss_value.item())
+        losses_train_PINN.append(train_total_loss.item())
+        dloss_train_PINN.append(train_data_loss_value.item())
+        pdeloss_train_PINN.append(train_pde_loss_value.item())
         
         """ Test Log """
         # Log the test losses to make figures
-        losses_test.append(test_total_loss.item())
+        losses_test_PINN.append(test_total_loss.item())
 
 
         # Update the weights and biases 
@@ -129,8 +133,61 @@ def optimization_loop(max_epochs, NN, loss_function, D_param, pde_w, optimizer, 
             if i % int(max_epochs/10) == 0:
                 print('\nIteration = ',i)
                 print(f'Total traning loss = {train_total_loss.item():.4f}')
-                print(f"Diff. coeff. = {D_param.item()}")
+                print(f"Diff. coeff. = {D_param.item() * scaling_factor * 10**4:.4f} x 10^(-4) [mm^2 s^(-1)]")
 
-    return D_train_during_training, losses_train, dloss_train, pdeloss_train, D_test_during_training, losses_test, dloss_test, pdeloss_test
+    return D_train_during_training_PINN, losses_train_PINN, dloss_train_PINN, pdeloss_train_PINN, losses_test_PINN
 
             
+def optimization_loop_NN_reg(max_epochs, NN, loss_function, optimizer, reg, lmb, scheduler, sched=False):
+    
+    test_data_list, test_input_list = get_test_data()
+    train_data_list, train_input_list = get_train_data()
+
+    from tqdm import tqdm
+    for i in tqdm(range(max_epochs)):
+
+        # Free all intermediate values:
+        optimizer.zero_grad() # Resetting the gradients to zeros
+        
+        """ Train """
+        # Forward pass for the data:
+        train_total_loss = data_loss(NN, train_input_list, train_data_list, loss_function)
+
+        """ Test """
+        with torch.no_grad():
+            # Forward pass for the data:
+            test_total_loss = data_loss(NN, test_input_list, test_data_list, loss_function)
+
+
+        if reg == 'L1': # Adding L1 regularization
+            l1_penalty = torch.nn.L1Loss(reduction='sum') # size_average=False
+            l1_reg_loss = 0
+            for param in NN.parameters():
+                l1_reg_loss += l1_penalty(param, torch.zeros_like(param))
+            train_total_loss += lmb * l1_reg_loss
+        
+        elif reg == 'L2': # Adding L2 regularization
+            l2_reg_term = 0
+            for param in NN.parameters():
+                l2_reg_term += torch.sum(param ** 2)
+            train_total_loss += lmb * l2_reg_term
+
+
+        # Backward pass, compute gradient w.r.t. weights and biases
+        train_total_loss.backward()
+
+        """ Train Log """
+        # Log the train losses to make figures
+        losses_train_ANN.append(train_total_loss.item())
+        
+        """ Test Log """
+        # Log the test losses to make figures
+        losses_test_ANN.append(test_total_loss.item())
+
+        # Update the weights and biases 
+        optimizer.step()
+        if sched:
+            scheduler.step()
+
+
+    return losses_train_ANN, losses_test_ANN
