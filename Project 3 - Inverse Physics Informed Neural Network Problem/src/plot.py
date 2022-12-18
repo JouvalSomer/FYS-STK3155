@@ -27,12 +27,17 @@ def train_plot_total_losses(total_losses, dloss, pdeloss, pde_w, optim):
     total_losses = torch.tensor(total_losses)
     total_losses = total_losses.cpu()
     plt.semilogy(total_losses, label=f'Total loss = data_loss + {str(pde_w)} * pde_loss', linestyle='dashed', zorder=100)
+    
     dloss = torch.tensor(dloss)
     dloss = dloss.cpu()
-    pdeloss = torch.tensor(pdeloss)
-    pdeloss = pdeloss.cpu()
     plt.semilogy(dloss, label='Data loss')
-    plt.semilogy(pdeloss, label='PDE loss')
+
+    if len(pdeloss) >= 1:
+        print(pdeloss)
+        pdeloss = torch.tensor(pdeloss)
+        pdeloss = pdeloss.cpu()
+        plt.semilogy(pdeloss, label='PDE loss')
+
     plt.title('Train losses')
     plt.ylabel("Loss", fontsize=20 , labelpad=10)
     plt.xlabel("Iteration", fontsize=20 , labelpad=10)

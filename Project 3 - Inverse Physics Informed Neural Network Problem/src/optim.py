@@ -3,16 +3,7 @@ import torch
 import copy
 from data import *
 
-D_train_during_training_PINN =[]
-dloss_train_PINN = []
-pdeloss_train_PINN = []
 
-losses_train_PINN = []
-losses_test_PINN = []
-
-
-losses_test_ANN = []
-losses_train_ANN = []
 
 tmin, tmax = get_min_max_time()
 
@@ -69,7 +60,13 @@ def pde_loss_residual(coords, nn, D, loss_function_PDE):
         return loss_function_PDE(residual, torch.zeros_like(residual))
 
 def optimization_loop(max_epochs, NN, loss_function_NN, loss_function_PDE, D_param, pde_w, optimizer, scheduler, sched=False, print_out=False, n_pde=int(1e5)):
-    
+    D_train_during_training_PINN =[]
+    dloss_train_PINN = []
+    pdeloss_train_PINN = []
+
+    losses_train_PINN = []
+    losses_test_PINN = []
+
     test_data_list, test_input_list = get_test_data()
     train_data_list, train_input_list = get_train_data()
 
@@ -85,6 +82,7 @@ def optimization_loop(max_epochs, NN, loss_function_NN, loss_function_PDE, D_par
         # Forward pass for the data:
         train_data_loss_value = data_loss(NN, train_input_list, train_data_list, loss_function_NN)
         # Forward pass for the PDE 
+        
         train_pde_loss_value = pde_loss_residual(train_pde_points, NN, D_param, loss_function_PDE)
         train_total_loss = train_data_loss_value  + pde_w * train_pde_loss_value
 
@@ -104,7 +102,8 @@ def optimization_loop(max_epochs, NN, loss_function_NN, loss_function_PDE, D_par
         # Log the train losses to make figures
         losses_train_PINN.append(train_total_loss.item())
         dloss_train_PINN.append(train_data_loss_value.item())
-        pdeloss_train_PINN.append(train_pde_loss_value.item())
+        if pde_w > 0.0:
+            pdeloss_train_PINN.append(train_pde_loss_value.item())
         
         """ Test Log """
         # Log the test losses to make figures
@@ -126,6 +125,8 @@ def optimization_loop(max_epochs, NN, loss_function_NN, loss_function_PDE, D_par
 
             
 def optimization_loop_NN_reg(max_epochs, NN, loss_function_NN, optimizer, scheduler, sched=False):
+    losses_test_ANN = []
+    losses_train_ANN = []
     
     test_data_list, test_input_list = get_test_data()
     train_data_list, train_input_list = get_train_data()
