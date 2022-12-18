@@ -35,10 +35,15 @@ def import_data(dataset, mask=True):
 def load_images(path_to_data, dataset):
     path_to_concentrations = path_to_data + dataset +  "/concentrations/"
     images = {}
+    sorted_images = {}
     for cfile in os.listdir(path_to_concentrations):
         c = np.load(path_to_concentrations + cfile)
         images[cfile[:-4]] = c
-    return images
+    sorted_images_list = sorted(images.items(), key=lambda x: x[0])
+    for i in sorted_images_list:
+        sorted_images[i[0]] = i[1]
+
+    return sorted_images
 
 def make_coordinate_grid(images):
     """ Create a (n x n x 2) array where arr[i,j, :] = (x_i, y_i) is the position of voxel (i,j)"""
@@ -122,6 +127,8 @@ images = load_images(path_to_data, dataset)
 coordinate_grid = make_coordinate_grid(images)
 datadict = get_input_output_pairs(coordinate_grid, mask=roi, images=images)[0]
 time_keys = get_timedata(coordinate_grid, roi, images)
+
+
 
 def get_test_time_keys():
     test_time_keys = time_keys[7::8] # 
