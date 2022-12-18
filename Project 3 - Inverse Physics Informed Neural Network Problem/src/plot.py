@@ -4,7 +4,8 @@ import torch
 from data import *
 from optim import *
 
-os.makedirs('results', exist_ok=True)
+def make_results_folder(optim):
+    os.makedirs(f'results_{optim}', exist_ok=True)
 # plt.rcParams.update({
 #     "text.usetex": True},
 #     "font.family": "serif",
@@ -20,7 +21,7 @@ plt.rc('lines', linewidth=2)
 plt.rcParams.update({'font.size': 20})
 
 """ Plot losses during traning """
-def train_plot_total_losses(total_losses, dloss, pdeloss, pde_w):
+def train_plot_total_losses(total_losses, dloss, pdeloss, pde_w, optim):
     plt.rcParams.update({'figure.max_open_warning': 0})
     plt.figure(dpi = 200)
     total_losses = torch.tensor(total_losses)
@@ -37,10 +38,10 @@ def train_plot_total_losses(total_losses, dloss, pdeloss, pde_w):
     plt.xlabel("Iteration", fontsize=20 , labelpad=10)
     plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
     plt.tight_layout()
-    plt.savefig(f'results/train_loss_plot.png')
+    plt.savefig(f'results_{optim}/train_loss_plot_{int(pde_w * 100)}.png')
     plt.clf()
 
-def test_plot_total_losses(total_losses):
+def test_plot_total_losses(total_losses, pde_w, optim):
     plt.rcParams.update({'figure.max_open_warning': 0})
     plt.figure(dpi = 200)
     total_losses = torch.tensor(total_losses)
@@ -51,10 +52,10 @@ def test_plot_total_losses(total_losses):
     plt.xlabel("Iteration", fontsize=20 , labelpad=10)
     plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
     plt.tight_layout()
-    plt.savefig(f'results/test_loss_plot.png')
+    plt.savefig(f'results_{optim}/test_loss_plot_{int(pde_w * 100)}.png')
     plt.clf()
 
-def train_test_total_losses(train_total_losses, test_total_losses):
+def train_test_total_losses(train_total_losses, test_total_losses, pde_w, optim):
     plt.rcParams.update({'figure.max_open_warning': 0})
     plt.figure(dpi = 200)
     train_total_losses = torch.tensor(train_total_losses)
@@ -66,13 +67,13 @@ def train_test_total_losses(train_total_losses, test_total_losses):
     plt.ylabel("Loss", fontsize=20 , labelpad=10)
     plt.xlabel("Iteration", fontsize=20 , labelpad=10)
     plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
-    plt.savefig(f'results/test_train_losses.png')
+    plt.savefig(f'results_{optim}/test_train_losses_{int(pde_w * 100)}.png')
     plt.tight_layout()
     plt.clf()
 
 
 '''Plot D during training'''
-def D_plot(D_during_train):
+def D_plot(D_during_train, pde_w, optim):
     plt.figure(dpi=200)
     plt.title("PINN's diffusion coefficient estimate against iterations", pad=15)
     plt.semilogy(D_during_train, label='The diffusion coefficient')
@@ -80,13 +81,13 @@ def D_plot(D_during_train):
     plt.xlabel("Iterations", fontsize=20 , labelpad=10)
     plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
     plt.tight_layout()
-    plt.savefig(f'results/D_plot.png')
+    plt.savefig(f'results_{optim}/D_plot_{int(pde_w * 100)}.png')
     plt.clf()
 
 
 """ Plot of the traning images """
 def train_images():
-    os.makedirs('results/train_images', exist_ok=True)
+    os.makedirs(f'train_images', exist_ok=True)
     dataset = "brain2dsmooth10"
     path_to_data, roi = import_data(dataset, mask=True)
     images = load_images(path_to_data, dataset)
@@ -105,13 +106,13 @@ def train_images():
         plt.title(f'Synthetic data at {true_time_keys[i]} hours', pad=15)
         plt.colorbar()
         plt.tight_layout()
-        plt.savefig(f'results/train_images/{str(int(true_time_keys[i]))}_true.png')
+        plt.savefig(f'train_images/{str(int(true_time_keys[i]))}_true.png')
         plt.clf()
 
 
 """ Comparison plot of the test prediction and the test data """
-def test_data_NN_prediction(NN):
-    os.makedirs('results/test_data_NN_prediction', exist_ok=True)
+def test_data_NN_prediction(NN, pde_w, optim):
+    os.makedirs(f'results_{optim}/test_data_NN_prediction', exist_ok=True)
 
     dataset = "brain2dsmooth10"
     path_to_data, roi = import_data(dataset, mask=True)
@@ -160,12 +161,12 @@ def test_data_NN_prediction(NN):
 
     cbar = fig.colorbar(img4, ax=axs, orientation='vertical', fraction=0.046, pad=0.1)
     plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
-    plt.savefig(f'results/test_data_NN_prediction/test_data_NN_prediction.png')
+    plt.savefig(f'results_{optim}/test_data_NN_prediction/test_data_NN_prediction_{int(pde_w * 100)}.png')
     plt.clf()
 
 
 
-def bvto(losses_train_ANN, losses_test_ANN, losses_train_PINN, losses_test_PINN):
+def bvto(losses_train_ANN, losses_test_ANN, losses_train_PINN, losses_test_PINN, pde_w, optim):
     
     losses_train_ANN = torch.tensor(losses_train_ANN)
     losses_test_ANN = torch.tensor(losses_test_ANN)
@@ -193,5 +194,5 @@ def bvto(losses_train_ANN, losses_test_ANN, losses_train_PINN, losses_test_PINN)
     ax[1].set_xlabel('Iterations', fontsize=20 , labelpad=10)
     ax[1].legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
 
-    plt.savefig(f'results/bvto.png')
+    plt.savefig(f'results_{optim}/bvto_{int(pde_w * 100)}.png')
     plt.clf()

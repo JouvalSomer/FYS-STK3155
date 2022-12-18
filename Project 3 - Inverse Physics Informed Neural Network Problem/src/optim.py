@@ -120,7 +120,7 @@ def optimization_loop(max_epochs, NN, loss_function_NN, loss_function_PDE, D_par
             if i % int(max_epochs/10) == 0:
                 print('\nIteration = ',i)
                 print(f'Total traning loss = {train_total_loss.item():.4f}')
-                print(f"Diff. coeff. = {D_param.item() * scaling_factor * 10**4:.4f} x 10^(-4) [mm^2 s^(-1)]")
+                print(f"Diff. coeff. = {D_param.item():.8f}") # * scaling_factor * 10**4:.4f x 10^(-4) [mm^2 s^(-1)]"
 
     return D_train_during_training_PINN, losses_train_PINN, dloss_train_PINN, pdeloss_train_PINN, losses_test_PINN
 

@@ -19,24 +19,25 @@ else:
 
 
 """     HYPERPARAMETERS     """
-max_epochs = 100 # Has to be greater than or equal to 10
-n_pde = int(1e5) # Number of residual points
+max_epochs = 51 # Has to be greater than or equal to 10
+n_pde = int(1e3) # Number of residual points
 D_init = 1.0 # Intial guess for the diff. coeff. D
 pde_w = 1.5 # PDE-weights
 
-sched_const = -0.5 # Schedular step-size factor. init_LR * 10^(sched_const * current_epoch/max_epochs)
-sched = False # Whether to use a schedular of not
+sched_const = -1.0 # Schedular step-size factor. init_LR * 10^(sched_const * current_epoch/max_epochs)
+sched = True # Whether to use a schedular of not
 
-learning_rate_NN = 1e-2 # Initial learningrate for the NN (the part that finds the consentration)
-learning_rate_D = 1e-2  # Initial learningrate for the PDE (the part that finds the diff. coeff.)
+learning_rate_NN = 1e-3 # Initial learningrate for the NN (the part that finds the consentration)
+learning_rate_D = 1e-3  # Initial learningrate for the PDE (the part that finds the diff. coeff.)
 
 optim = 'ADAM' # Optimzer. Choose between: 'ADAM' or 'L-BFGS'
+print(f'Using {optim}\n')
+ANN = False # ANN without the physics 
 
 print_out = True # Prints out the iteration, total loss and current diff. coeff. every 10% of max_epochs
 
 # Defining the NN:
 NN_PINN = Net(num_hidden_units=32, num_hidden_layers=5, inputs=3, inputnormalization=True).to(device)
-NN_ANN = Net(num_hidden_units=32, num_hidden_layers=5, inputs=3, inputnormalization=True).to(device)
 
 
 loss_function_NN =torch.nn.MSELoss(reduction="mean") # Loss function. Choose between: MSELoss and L1Loss
@@ -48,7 +49,7 @@ D_param = torch.tensor(D_init, device=device, dtype=torch.float)
 D_param = torch.nn.Parameter(D_param, requires_grad=True)
 D_param = D_param.to(device)
 
-
+make_results_folder(optim)
 
 """ Set optimizer """
 # ADAM
@@ -56,15 +57,11 @@ if optim == 'ADAM':
     params_PINN = list(NN_PINN.parameters())
     optimizerPINN = torch.optim.Adam([{'params': params_PINN, "lr" : learning_rate_NN},
                                 {'params': D_param, 'lr': learning_rate_D}])
-    
-    params_ANN = list(NN_ANN.parameters())
-    optimizerANN = torch.optim.Adam([{'params': params_ANN, "lr" : learning_rate_NN},
-                                {'params': D_param, 'lr': learning_rate_D}])
+
 
     lr_lambda = lambda current_epoch: 10 ** (sched_const * current_epoch / max_epochs) # LR scheduler function
     schedulerPINN = torch.optim.lr_scheduler.LambdaLR(optimizerPINN, lr_lambda=lr_lambda)
 
-    schedulerANN = torch.optim.lr_scheduler.LambdaLR(optimizerANN, lr_lambda=lr_lambda)
 
     print('Optimization loop for the PINN has started with max epochs = ', max_epochs)
     start = time.time()
@@ -75,14 +72,20 @@ if optim == 'ADAM':
     tot_time = end - start
     print('\nOptimization loop for the PINN has ended. Total time used was:', str(datetime.timedelta(seconds=tot_time)), '\n')
     
-    print('Optimization loop for the ANN has started with max epochs = ', max_epochs)
-    start = time.time()
-    losses_train_ANN, losses_test_ANN = optimization_loop_NN_reg(max_epochs, NN_ANN, loss_function_NN, optimizerANN, schedulerANN, sched=False)
-    end = time.time()
-    tot_time = end - start
-    print('\nOptimization loop for the ANN has ended. Total time used was:', str(datetime.timedelta(seconds=tot_time)), '\n')
-
-    bvto(losses_train_ANN, losses_test_ANN, losses_train_PINN, losses_test_PINN)
+    if ANN:
+        NN_ANN = Net(num_hidden_units=32, num_hidden_layers=5, inputs=3, inputnormalization=True).to(device)
+        params_ANN = list(NN_ANN.parameters())
+        optimizerANN = torch.optim.Adam([{'params': params_ANN, "lr" : learning_rate_NN},
+                                    {'params': D_param, 'lr': learning_rate_D}])
+        lr_lambda = lambda current_epoch: 10 ** (sched_const * current_epoch / max_epochs) # LR scheduler function
+        schedulerANN = torch.optim.lr_scheduler.LambdaLR(optimizerANN, lr_lambda=lr_lambda)
+        print('Optimization loop for the ANN has started with max epochs = ', max_epochs)
+        start = time.time()
+        losses_train_ANN, losses_test_ANN = optimization_loop_NN_reg(max_epochs, NN_ANN, loss_function_NN, optimizerANN, schedulerANN, sched=False)
+        end = time.time()
+        tot_time = end - start
+        print('\nOptimization loop for the ANN has ended. Total time used was:', str(datetime.timedelta(seconds=tot_time)), '\n')
+        bvto(losses_train_ANN, losses_test_ANN, losses_train_PINN, losses_test_PINN, pde_w)
 
 
 # L-BFGS
@@ -162,22 +165,22 @@ L_squared = 5648.0133
 T = 172800.0
 scaling_factor = L_squared / T
 
-D_train_during_training = np.array(D_train_during_training)*scaling_factor
 D_train_mean = sum(D_train_during_training[-50:])/50
+D_train_during_training = np.array(D_train_during_training)
 
-print(f'Mean of last 50 D_train in SI = {D_train_mean*scaling_factor * 10**4:.4f} x 10^(-4) [mm^2 s^(-1)]')
-print(f'The last D_train in SI = {D_train_during_training[-1]*scaling_factor * 10**4:.4f} x 10^(-4) [mm^2 s^(-1)]')
+print(f'\nMean of last 50 D_train= {D_train_mean:.8f}') # * scaling_factor * 10**4:.4f x 10^(-4) [mm^2 s^(-1)]
+print(f'The last D_train= {D_train_during_training[-1]:.8f}') # * scaling_factor * 10**4:.4f} x 10^(-4) [mm^2 s^(-1)]')
 
-print('Started plotting and saving the figs. This may take a minute.')
+print('\nStarted plotting and saving the figs. This may take a minute.')
 
-train_plot_total_losses(losses_train_PINN, dloss_train, pdeloss_train, pde_w)
-test_plot_total_losses(losses_test_PINN)
-train_test_total_losses(losses_train_PINN, losses_test_PINN)
+train_plot_total_losses(losses_train_PINN, dloss_train, pdeloss_train, pde_w, optim)
+test_plot_total_losses(losses_test_PINN, pde_w, optim)
+train_test_total_losses(losses_train_PINN, losses_test_PINN, pde_w, optim)
 
-D_plot(D_train_during_training)
+D_plot(D_train_during_training, pde_w, optim)
 
 train_images()
-test_data_NN_prediction(NN_PINN)
+test_data_NN_prediction(NN_PINN, pde_w, optim)
 
 print('Finished plotting and saving the figs.\n')
 
