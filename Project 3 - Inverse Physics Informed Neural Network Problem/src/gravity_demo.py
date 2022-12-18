@@ -60,13 +60,9 @@ lbfgs_optim = torch.optim.LBFGS(params,
                                 tolerance_change=1e-10,
                                 line_search_fn="strong_wolfe")
 
-
 def pde_loss(nn, residual_points, g):
-    
     residual_points.requires_grad = True
-    
     y = nn(residual_points)
-    
     dy_dt, = torch.autograd.grad(outputs=y,
                              inputs=residual_points,
                              grad_outputs=torch.ones_like(residual_points),
@@ -89,8 +85,9 @@ def boundary_loss(nn, boundary_points, boundary_values):
     return loss_function(predictions, boundary_values)
     
 losses_train = []
-g_values_train = []
+losses_test = []
 
+g_values_train = []
 
 def closure():
     lbfgs_optim.zero_grad()
@@ -99,58 +96,85 @@ def closure():
     
     pde_loss_value = pde_loss(NN, times_train, g_param)
     
-    loss = data_loss_value + pde_loss_value
-    
-    if loss.requires_grad:
-        loss.backward()
+    loss_train = data_loss_value + pde_loss_value
+
+    if loss_train.requires_grad:
+        loss_train.backward()
         
     # Log both the loss and g during training:
-    losses_train.append(loss.item())
+    losses_train.append(loss_train.item())
     g_values_train.append(g_param.item())
     
-    return loss
+    return loss_train
 
 
 lbfgs_optim.step(closure)
 
 prediction = NN(times_test)
-plt.scatter(times_test.tolist(), prediction.tolist())
-plt.show()
 
+os.makedirs('results', exist_ok=True)
+
+plt.rcParams['figure.figsize'] = (12,9)
+
+plt.rc('axes', facecolor='whitesmoke', edgecolor='none',
+    axisbelow=True, grid=True)
+plt.rc('grid', color='w', linestyle='solid')
+plt.rc('lines', linewidth=2)
+
+plt.rcParams.update({'font.size': 20})
 os.makedirs('results_gravity_test', exist_ok=True)
 
+plt.figure(dpi = 200)
+plt.scatter(times_test.tolist(), prediction.tolist(), label='Test set prediction')
+plt.title('PINN prediction', pad=15)
+plt.xlabel("Time", fontsize=20 , labelpad=10)
+plt.ylabel("Pinn prediction of $y$", fontsize=20 , labelpad=10)
+plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
+plt.tight_layout()
+plt.savefig(f'results_gravity_test/prediction.png')
+plt.clf()
+
+plt.figure(dpi = 200)
 plt.plot(times.tolist(), positions.tolist(), label="True $y(t)$")
-plt.plot(measurement_times.tolist(), measurements.tolist(), "x", label= str(num_measurements)+ " Measurements")
-plt.xlabel("time")
-plt.ylabel("Height $y$")
-plt.legend()
-# plt.savefig(f'results_gravity_test/data.png')
-# plt.clf()
-plt.show()
+plt.plot(measurement_times.tolist(), measurements.tolist(), "x", label= str(num_measurements) + " Measurements")
+plt.title('True $y(t)$ and noisy data measurements', pad=15)
+plt.xlabel("Time", fontsize=20 , labelpad=10)
+plt.ylabel("Height $y(t)$", fontsize=20 , labelpad=10)
+plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
+plt.tight_layout()
+plt.savefig(f'results_gravity_test/data.png')
+plt.clf()
 
-plt.figure()
-plt.title("Loss")
-plt.semilogy(losses_train)
-# plt.savefig(f'results_gravity_test/loss_plot.png')
-# plt.clf()
-plt.show()
 
-plt.figure()
-plt.title("g during training, final g= "+format(g_param.item(), ".2f"), fontsize=14)
-plt.plot(g_values_train, label="g parameter")
+plt.figure(dpi = 200)
+plt.semilogy(losses_train, label='Traning loss')
+plt.title('Train loss', pad=15)
+plt.xlabel("Iterations", fontsize=20 , labelpad=10)
+plt.ylabel("Loss", fontsize=20 , labelpad=10)
+plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
+plt.tight_layout()
+plt.savefig(f'results_gravity_test/loss_plot.png')
+plt.clf()
+
+
+plt.figure(dpi = 200)
+plt.title("Gracitational acceleration g during training, final g= "+format(g_param.item(), ".2f"), pad=15)
+plt.plot(g_values_train, label="Gracitational acceleration g")
 plt.plot(np.zeros(len(g_values_train)) + g, label="True")
-plt.legend()
-# plt.savefig(f'results_gravity_test/g_during_training.png')
-# plt.clf()
-plt.show()
+plt.xlabel("Iterations", fontsize=20 , labelpad=10)
+plt.ylabel("Gracitational acceleration g", fontsize=20 , labelpad=10)
+plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
+plt.tight_layout()
+plt.savefig(f'results_gravity_test/g_during_training.png')
+plt.clf()
 
-
+plt.figure(dpi = 200)
 plt.plot(times.tolist(), positions.tolist(), marker="o", markevery=14, label="True")
 plt.plot(measurement_times.tolist(), measurements.tolist(), "x", label= str(num_measurements)+ " Measurements")
 plt.plot(times.tolist(), NN(times).tolist(), "-", marker="s", markevery=10, label="NN")
-plt.xlabel("time")
-plt.ylabel("Height")
-plt.legend()
-# plt.savefig(f'results_gravity_test/network_predict.png')
-# plt.clf()
-plt.show()
+plt.xlabel("Time", fontsize=20 , labelpad=10)
+plt.ylabel("Height", fontsize=20 , labelpad=10)
+plt.legend(framealpha=0.9, facecolor=(1, 1, 1, 1))
+plt.tight_layout()
+plt.savefig(f'results_gravity_test/network_predict.png')
+plt.clf()
