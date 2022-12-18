@@ -121,7 +121,6 @@ def test_data_NN_prediction(NN, pde_w, optim):
     datadict, true_time_keys = get_input_output_pairs(coordinate_grid, mask=roi, images=images)
 
     test_time_keys = get_test_time_keys()
-
     fig, axs = plt.subplots(2, 2, figsize=[12,9], sharex=True)
 
 

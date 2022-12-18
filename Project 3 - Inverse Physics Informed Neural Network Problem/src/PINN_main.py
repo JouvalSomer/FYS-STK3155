@@ -19,10 +19,12 @@ else:
 
 
 """     HYPERPARAMETERS     """
-max_epochs = 51 # Has to be greater than or equal to 10
+max_epochs = 10 # Has to be greater than or equal to 10
 n_pde = int(1e3) # Number of residual points
 D_init = 1.0 # Intial guess for the diff. coeff. D
-pde_w = 1.5 # PDE-weights
+pde_w = 0.00 # PDE-weights
+
+# pde_w_list = [0.00, 0.25, 0.50, 0.75, 1.00, 1.25, 1.50]
 
 sched_const = -1.0 # Schedular step-size factor. init_LR * 10^(sched_const * current_epoch/max_epochs)
 sched = True # Whether to use a schedular of not

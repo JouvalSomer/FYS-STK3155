@@ -42,7 +42,6 @@ def load_images(path_to_data, dataset):
     sorted_images_list = sorted(images.items(), key=lambda x: x[0])
     for i in sorted_images_list:
         sorted_images[i[0]] = i[1]
-
     return sorted_images
 
 def make_coordinate_grid(images):
@@ -76,9 +75,7 @@ def get_input_output_pairs(coordinate_grid, mask, images):
     true_min = np.min([np.min(images[key][mask]) for key in images.keys()])
     true_max = np.max([np.max(images[key][mask]) for key in images.keys()])
     max_min_images = true_max - true_min
-
     for timekey, image in images.items():
-
         xyt_true = image[mask]
         xyt_true_scaled = 2 * (xyt_true - true_min)/max_min_images - 1 # Scaling the true consentration
 
@@ -93,9 +90,8 @@ def get_input_output_pairs(coordinate_grid, mask, images):
 
     return input_output_pairs, true_time_keys
 
-def get_timedata(coordinate_grid, mask, images):
+def get_timedata(input_output_pairs, mask, images):
     """ Returns the scaled timekeys """
-    input_output_pairs = get_input_output_pairs(coordinate_grid, mask, images)[0]
     scaled_timekey = list(input_output_pairs.keys())
     return scaled_timekey 
 
@@ -126,28 +122,29 @@ path_to_data, roi = import_data(dataset, mask=True)
 images = load_images(path_to_data, dataset)
 coordinate_grid = make_coordinate_grid(images)
 datadict = get_input_output_pairs(coordinate_grid, mask=roi, images=images)[0]
-time_keys = get_timedata(coordinate_grid, roi, images)
+time_keys = get_timedata(datadict, roi, images)
 
 
+test_time_keys = time_keys[7::8] # 
+time_keys.pop(7)
+time_keys.pop(14)
+train_time_keys = time_keys
 
 def get_test_time_keys():
-    test_time_keys = time_keys[7::8] # 
     return test_time_keys
 
 def get_train_time_keys():
-    time_keys.pop(7)
-    time_keys.pop(14)
-    train_time_keys = time_keys
     return train_time_keys
 
-test_time_keys = get_test_time_keys()
-train_time_keys = get_train_time_keys()
+
 
 def get_test_data():
+    test_time_keys = get_test_time_keys()
     data_list, input_list = create_space_time_tensor(test_time_keys, datadict, test_data_list, test_input_list, using_gpu, spatial_dim)    
     return data_list, input_list
 
 def get_train_data():
+    train_time_keys = get_train_time_keys()
     data_list, input_list = create_space_time_tensor(train_time_keys, datadict, train_data_list, train_input_list, using_gpu, spatial_dim)
     return data_list, input_list
 
