@@ -14,6 +14,19 @@ for simplicity reasons use synthetically made simulated MRI-like images. Alongsi
 
 ## **Content of folders:**
 
+* ## Additonal exercise - bias-variance tradeoff
+  * **linear_regression.py**
+  
+     This script loops through design matrices for polynomial fits of different order. 
+     For each polynomial, the MSE, bias and variance of the model was calculated and plotted. 
+  * **neuralNetwork.py**
+  
+     This script loops through a bunch of neural networks with varying number of nodes in the hidden layers.
+     For each network, the MSE, bias and variance of the model was calculated and plotted. 
+  * **decisionTree.py**
+
+     This script grows random forests with 100 decision trees. This is done for trees of varying depth. 
+     The best tree in each forest is used to model the given dataset. For each tree, the MSE, bias and variance of the model was calculated and plotted. 
 * ## src
   * **PINN_main.py**
   
@@ -39,9 +52,6 @@ for simplicity reasons use synthetically made simulated MRI-like images. Alongsi
     
   * ## data
        This folder contains the two data-sets used and masks for region of interest selection (used for train/test splt).
-
-* ## results
-    This folder contains all the plotts described above.
 
 ---
 ## Requirements
