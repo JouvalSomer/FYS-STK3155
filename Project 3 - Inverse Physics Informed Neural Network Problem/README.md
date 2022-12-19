@@ -6,7 +6,7 @@
 > In hopes of getting a better understanding of the glymphatic system and to demonstrate the potential of PINNs we want to, in this study, apply a physics-informed neural network model to investigate the diffusive properties of a tracer molecule observed via MRI imaging over a period of 48 hours. We will for simplicity use synthetically made simulated MRI-like images with no noise alongside the diffusion equation to try to predict the concentration and estimate the diffusion coefficient of the tracer.
 ---
 
-### In this GitHub repo you'll find two folders. One folder, src, containing the source files and the data that was used, and one, results, containing the results.
+### In this GitHub repo you'll find a folder, src, containing the source files and the data that was used.
 
 ## **Content of folders:**
 
