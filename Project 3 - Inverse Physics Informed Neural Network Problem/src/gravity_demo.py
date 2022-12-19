@@ -72,6 +72,7 @@ def pde_loss(nn, residual_points, g):
                                  inputs=residual_points,
                                  grad_outputs=torch.ones_like(residual_points),
                                  create_graph=True) 
+    
     # The ODE:
     residual = ddy_dtt + g
     
@@ -158,7 +159,7 @@ plt.clf()
 
 
 plt.figure(dpi = 200)
-plt.title("Gracitational acceleration g during training, final g= "+format(g_param.item(), ".2f"), pad=15)
+plt.title(f"Gracitational acceleration g during training, final g = {g_param.item():.2} ms^(-1)", pad=15)
 plt.plot(g_values_train, label="Gracitational acceleration g")
 plt.plot(np.zeros(len(g_values_train)) + g, label="True")
 plt.xlabel("Iterations", fontsize=20 , labelpad=10)

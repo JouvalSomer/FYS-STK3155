@@ -21,23 +21,25 @@ def data_loss(nn, input_list, data_list, loss_function_NN):
     return loss/count
 
 def pde_loss_residual(coords, nn, D, loss_function_PDE):
-        # assert isinstance(D, torch.nn.Parameter)
-        assert coords.shape[-1] == 3, "array should have size N x 3"
-        
+
+        assert isinstance(D, torch.nn.Parameter), "D should be a parameter of the network."
+        assert coords.shape[-1] == 3, "Array should have size N x 3."
+
         coords.requires_grad = True
-        output = nn(coords).squeeze()
+        output = nn(coords).squeeze() # Forward pass of coords through the network
 
         ones = torch.ones_like(output)
 
+        # Take the gradient of the output
         output_grad, = torch.autograd.grad(outputs=output,
                                         inputs=coords,
                                         grad_outputs=ones,
                                         create_graph=True)
 
-        doutput_dt = output_grad[..., -1]
         doutput_dx = output_grad[..., 0]
         doutput_dy = output_grad[..., 1]
-        
+        doutput_dt = output_grad[..., -1]
+
         ddoutput_dxx, = torch.autograd.grad(outputs=doutput_dx,
                                             inputs=coords,
                                             grad_outputs=ones,
@@ -82,7 +84,6 @@ def optimization_loop(max_epochs, NN, loss_function_NN, loss_function_PDE, D_par
         # Forward pass for the data:
         train_data_loss_value = data_loss(NN, train_input_list, train_data_list, loss_function_NN)
         # Forward pass for the PDE 
-        
         train_pde_loss_value = pde_loss_residual(train_pde_points, NN, D_param, loss_function_PDE)
         train_total_loss = train_data_loss_value  + pde_w * train_pde_loss_value
 

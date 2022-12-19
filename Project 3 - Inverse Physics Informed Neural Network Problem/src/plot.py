@@ -33,7 +33,6 @@ def train_plot_total_losses(total_losses, dloss, pdeloss, pde_w, optim):
     plt.semilogy(dloss, label='Data loss')
 
     if len(pdeloss) >= 1:
-        print(pdeloss)
         pdeloss = torch.tensor(pdeloss)
         pdeloss = pdeloss.cpu()
         plt.semilogy(pdeloss, label='PDE loss')
